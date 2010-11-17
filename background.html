@@ -1,0 +1,20 @@
+<html>
+<head>
+<script>
+  var min = 32;
+  var max = 48;
+  var current = min;
+
+  function updateIcon() {
+    chrome.browserAction.setIcon({path:"icon_" + current + ".png"});
+    current++;
+
+    if (current > max)
+      current = min;
+  }
+
+  chrome.browserAction.onClicked.addListener(updateIcon);
+  updateIcon();
+</script>
+</head>
+</html>
