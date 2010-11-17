@@ -13,5 +13,13 @@
 	},
   "permissions": [
     "tabs"
+  ],
+  "content_scripts": [
+    {
+      "js": ["windowtiler.js"],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
   ]
 }
