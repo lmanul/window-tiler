@@ -20,17 +20,27 @@ function getTabs(tabs) {
   chrome.windows.getAll({"populate" : true}, tileWindows);
 }
 
+function repositionAndResizeWindow(window, left, top, width, height, callback) {
+  chrome.windows.update(window.id, {
+    'left': left,
+    'top': top,
+    'width': width,
+    'height': height
+  }, callback);
+}
+
 function tileWindows(windows) {
   var numWindows = windows.length;
   var myWindow = windows.pop();
   window.console.log(windows);
   for (var i = 0, myWindow; i < windows.length; i++) {
     myWindow = windows[i];
-    chrome.windows.update(myWindow.id, {
-      'width': screen.width / 4,
-      'height': screen.width / 4},
-      finished);
-  }
+    repositionAndResizeWindow(
+        windows[i],
+        0, 0,
+        500, 500,
+        finished);
+   }
 }
 
 // Set up a click handler so that we can tile all the windows.
