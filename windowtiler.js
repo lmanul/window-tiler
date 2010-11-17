@@ -28,19 +28,28 @@ function repositionAndResizeWindow(windowId, left, top, width, height, callback)
   }, callback);
 }
 
+function pushTileIntoTileContext(window, left, top, width, height,
+    tileContext) {
+  tileContext.push({
+    id: window.id,
+    left: left,
+    top: top,
+    width: width,
+    height: height
+  });
+  return tileContext;
+}
+
 function computeTiles(tileContext, windows, zoneX, zoneY, zoneWidth,
     zoneHeight) {
   if (!windows.length) {
     return tileContext;
   }
+  
+  if (zoneX > zoneY) {
+  }
   var myWindow = windows.pop();
-  tileContext.push({
-    id: myWindow.id,
-    left: 0,
-    top: 0,
-    width: 600,
-    height: 600
-  });
+  pushTileIntoTileContext(myWindow, 0, 0, 600, 600, tileContext);
   return computeTiles(tileContext, windows, zoneX, zoneY,
       zoneWidth, zoneHeight);
 }
@@ -51,8 +60,6 @@ function tileWindows(windows) {
       screen.width, screen.height);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
-    window.console.log(tile);
-    window.console.log(tile.id);
     repositionAndResizeWindow(tile.id, tile.left, tile.top,
         tile.width, tile.height, finished);
   }
