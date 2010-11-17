@@ -1,20 +1,41 @@
 <html>
 <head>
 <script>
-  var min = 32;
-  var max = 48;
-  var current = min;
 
-  function updateIcon() {
-    chrome.browserAction.setIcon({path:"icon_" + current + ".png"});
-    current++;
+  var targetWindow = null;
+  var tabCount = 0;
 
-    if (current > max)
-      current = min;
+  function start(tab) {
+    chrome.windows.getCurrent(getWindows);
   }
 
-  chrome.browserAction.onClicked.addListener(updateIcon);
-  updateIcon();
+  function finished(window) {
+    alert('Finished!');
+  }
+
+  function getWindows(win) {
+    targetWindow = win;
+    chrome.tabs.getAllInWindow(targetWindow.id, getTabs);
+  }
+
+  function getTabs(tabs) {
+    tabCount = tabs.length;
+    // We require all the tab information to be populated.
+    chrome.windows.getAll({"populate" : true}, moveTabs);
+  }
+    
+  function moveTabs(windows) {
+    var numWindows = windows.length;
+    window = windows.pop();
+    alert(windows.length);
+    window.console.log(windows);
+    window.console.log(window);
+    alert(window.id);
+    chrome.windows.update(window.id, {'width': screen.width, 'height': screen.width}, finished);
+  }
+
+  // Set up a click handler so that we can tile all the windows.
+  chrome.browserAction.onClicked.addListener(start);
 </script>
 </head>
 </html>

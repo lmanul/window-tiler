@@ -2,6 +2,7 @@
   "name": "Window Tiler",
   "version": "0.1",
   "description": "Tile your windows with a single click.",
+  "background_page": "background.html",
   "browser_action": {
     "name": "Click to tile your windows",
     "default_icon": "icon_19.png"
