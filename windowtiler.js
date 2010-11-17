@@ -6,7 +6,6 @@ function start(tab) {
 }
 
 function finished(myWindow) {
-  window.console.log('Finished resizing window ' + myWindow.id);
 }
 
 function getWindows(win) {
@@ -20,8 +19,8 @@ function getTabs(tabs) {
   chrome.windows.getAll({"populate" : true}, tileWindows);
 }
 
-function repositionAndResizeWindow(window, left, top, width, height, callback) {
-  chrome.windows.update(window.id, {
+function repositionAndResizeWindow(windowId, left, top, width, height, callback) {
+  chrome.windows.update(windowId, {
     'left': left,
     'top': top,
     'width': width,
@@ -29,18 +28,34 @@ function repositionAndResizeWindow(window, left, top, width, height, callback) {
   }, callback);
 }
 
-function tileWindows(windows) {
-  var numWindows = windows.length;
+function computeTiles(tileContext, windows, zoneX, zoneY, zoneWidth,
+    zoneHeight) {
+  if (!windows.length) {
+    return tileContext;
+  }
   var myWindow = windows.pop();
-  window.console.log(windows);
-  for (var i = 0, myWindow; i < windows.length; i++) {
-    myWindow = windows[i];
-    repositionAndResizeWindow(
-        windows[i],
-        0, 0,
-        500, 500,
-        finished);
-   }
+  tileContext.push({
+    id: myWindow.id,
+    left: 0,
+    top: 0,
+    width: 600,
+    height: 600
+  });
+  return computeTiles(tileContext, windows, zoneX, zoneY,
+      zoneWidth, zoneHeight);
+}
+
+function tileWindows(windows) {
+  var tileContext = [];
+  tileContext = computeTiles(tileContext, windows, 0, 0,
+      screen.width, screen.height);
+  for (var i = 0, tile; i < tileContext.length; i++) {
+    tile = tileContext[i];
+    window.console.log(tile);
+    window.console.log(tile.id);
+    repositionAndResizeWindow(tile.id, tile.left, tile.top,
+        tile.width, tile.height, finished);
+  }
 }
 
 // Set up a click handler so that we can tile all the windows.
