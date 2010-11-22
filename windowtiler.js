@@ -29,12 +29,12 @@ WindowTiler.finished = function(myWindow) {
 
 WindowTiler.prototype.getWindows = function(win) {
   var targetWindow = win;
-  chrome.tabs.getAllInWindow(targetWindow.id, WindowTiler.getTabs);
+  chrome.tabs.getAllInWindow(targetWindow.id, bind(this.getTabs, this));
 };
 
-WindowTiler.getTabs = function(tabs) {
+WindowTiler.prototype.getTabs = function(tabs) {
   // We require all the tab information to be populated.
-  chrome.windows.getAll({"populate" : true}, WindowTiler.tileWindows);
+  chrome.windows.getAll({"populate" : true}, bind(this.tileWindows, this));
 };
 
 WindowTiler.repositionAndResizeWindow = function(windowId, left, top,
@@ -97,7 +97,7 @@ WindowTiler.computeTiles = function(tileContext, numWindows, zoneX, zoneY,
   return tileContext;
 };
 
-WindowTiler.tileWindows = function(windows) {
+WindowTiler.prototype.tileWindows = function(windows) {
   var tileContext = [];
   tileContext = WindowTiler.computeTiles(tileContext, windows.length, 0, 0,
       screen.width, screen.height);
