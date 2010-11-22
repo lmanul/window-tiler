@@ -1,6 +1,6 @@
 {
   "name": "Window Tiler",
-  "version": "0.1",
+  "version": "0.11",
   "description": "Tile your windows with a single click.",
   "background_page": "background.html",
   "browser_action": {
