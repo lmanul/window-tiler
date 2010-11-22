@@ -24,8 +24,7 @@ WindowTiler.prototype.finished = function(myWindow) {
 };
 
 WindowTiler.prototype.getWindows = function(win) {
-  var targetWindow = win;
-  chrome.tabs.getAllInWindow(targetWindow.id, bind(this.getTabs, this));
+  chrome.tabs.getAllInWindow(win.id, bind(this.getTabs, this));
 };
 
 WindowTiler.prototype.getTabs = function(tabs) {
