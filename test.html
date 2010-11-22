@@ -2,9 +2,36 @@
 <head>
   <script src="windowtiler.js"></script>
   <script>
+  var windowTiler = new WindowTiler();
+  var success = true;
 
+  // TODO: Need to import and use an actual test harness.
   function test() {
-    alert('Success');
+    var bigArea = createArea(0, 0, 1280, 1024);
+    var mediumArea = createArea(0, 0, 800, 600);
+    var smallArea = createArea(0, 0, 640, 480);
+    var bigAreaCopy = createArea(0, 0, 1280, 1024);
+
+    assert(windowTiler.compareAreas(bigArea, smallArea) > 0);
+    assert(windowTiler.compareAreas(bigArea, mediumArea) > 0);
+    assert(windowTiler.compareAreas(smallArea, mediumArea) < 0);
+    assert(windowTiler.compareAreas(bigArea, bigAreaCopy) == 0);
+
+    alert(success ? 'Success' : 'Failure');
+  }
+
+  function createArea(x, y, width, height) {
+    return {
+      'left': x,
+      'top': y,
+      'width': width,
+      'height': height};
+  }
+
+  function assert(statement) {
+    if (!statement) {
+      success = false;
+    }
   }
 
   </script>
