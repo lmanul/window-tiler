@@ -131,7 +131,7 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
 WindowTiler.prototype.tileWindows = function(windows) {
   var tileContext = [];
   tileContext = this.computeTiles(tileContext, windows.length,
-      0, 0, screen.availWidth, screen.availHeight);
+      screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight);
       //this.availableScreenRealEstate.left,
       //this.availableScreenRealEstate.top,
       //this.availableScreenRealEstate.width,
