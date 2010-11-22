@@ -2,9 +2,11 @@
 <head>
   <script src="windowtiler.js"></script>
   <script type="text/javascript">
-    // Set up a click handler so that we can tile all the windows.
     var windowTiler = new WindowTiler();
-    chrome.browserAction.onClicked.addListener(windowTiler.start);
+
+    // Set up a click handler so that we can tile all the windows.
+    chrome.browserAction.onClicked.addListener(bind(windowTiler.start,
+        windowTiler));
   </script>
 </head>
 </html>

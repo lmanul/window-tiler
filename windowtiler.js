@@ -1,23 +1,38 @@
 
+// Let's pollute the global namespace with these two functions so that we can
+// keep a normal object-oriented paradigm the rest of the time.
+
+function toArray(obj) {
+    return Array.prototype.slice.call(obj);
+}
+
+// Bind in its simplest form.
+function bind(fn, scope) {
+  return function () {
+      return fn.apply(scope, toArray(arguments));
+  };
+}
+
 WindowTiler = function() {};
 
-var targetWindow = null;
-var tabCount = 0;
+WindowTiler.prototype.start = function(tab) {
+  chrome.windows.getCurrent(bind(this.getWindows, this));
+};
 
-WindowTiler.prototype.start = function start(tab) {
-  chrome.windows.getCurrent(WindowTiler.getWindows);
+WindowTiler.prototype.test = function (text) {
+  alert(text);
 };
 
 WindowTiler.finished = function(myWindow) {
+  // Do nothing for now.
 };
 
-WindowTiler.getWindows = function(win) {
-  targetWindow = win;
+WindowTiler.prototype.getWindows = function(win) {
+  var targetWindow = win;
   chrome.tabs.getAllInWindow(targetWindow.id, WindowTiler.getTabs);
 };
 
 WindowTiler.getTabs = function(tabs) {
-  tabCount = tabs.length;
   // We require all the tab information to be populated.
   chrome.windows.getAll({"populate" : true}, WindowTiler.tileWindows);
 };
