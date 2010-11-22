@@ -113,7 +113,7 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
         halfWidth, zoneHeight);
     tileContext = this.computeTiles(tileContext,
         numWindows - halfNumWindows,
-        zoneX + halfWidth, zoneY,
+        zoneX + halfWidth + 1, zoneY,
         zoneWidth - halfWidth, zoneHeight);
   } else {
     var halfHeight = Math.floor(zoneHeight / 2);
@@ -122,7 +122,7 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
         zoneWidth, halfHeight);
     tileContext = this.computeTiles(tileContext,
         numWindows - halfNumWindows,
-        zoneX, zoneY + halfHeight,
+        zoneX, zoneY + halfHeight + 1,
         zoneWidth, zoneHeight - halfHeight);
   }
   return tileContext;
