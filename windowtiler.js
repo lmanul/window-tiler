@@ -19,11 +19,7 @@ WindowTiler.prototype.start = function(tab) {
   chrome.windows.getCurrent(bind(this.getWindows, this));
 };
 
-WindowTiler.prototype.test = function (text) {
-  alert(text);
-};
-
-WindowTiler.finished = function(myWindow) {
+WindowTiler.prototype.finished = function(myWindow) {
   // Do nothing for now.
 };
 
@@ -37,7 +33,7 @@ WindowTiler.prototype.getTabs = function(tabs) {
   chrome.windows.getAll({"populate" : true}, bind(this.tileWindows, this));
 };
 
-WindowTiler.repositionAndResizeWindow = function(windowId, left, top,
+WindowTiler.prototype.repositionAndResizeWindow = function(windowId, left, top,
     width, height, callback) {
   chrome.windows.update(windowId, {
     'left': left,
@@ -47,8 +43,8 @@ WindowTiler.repositionAndResizeWindow = function(windowId, left, top,
   }, callback);
 };
 
-WindowTiler.pushTileIntoTileContext = function(left, top, width, height,
-    tileContext) {
+WindowTiler.prototype.pushTileIntoTileContext = function(left, top, width,
+    height, tileContext) {
   tileContext.push({
     left: left,
     top: top,
@@ -58,8 +54,8 @@ WindowTiler.pushTileIntoTileContext = function(left, top, width, height,
   return tileContext;
 };
 
-WindowTiler.computeTiles = function(tileContext, numWindows, zoneX, zoneY,
-    zoneWidth, zoneHeight) {
+WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
+    zoneY, zoneWidth, zoneHeight) {
   window.console.log('Computing tiles: ' + zoneX + ', ' + zoneY + ', ' +
       zoneWidth + ', ' + zoneHeight + ' for ' + numWindows + ' windows');
 
@@ -69,7 +65,7 @@ WindowTiler.computeTiles = function(tileContext, numWindows, zoneX, zoneY,
 
   // Base case: only one window remains, we occupy the whole remaining space.
   if (numWindows == 1) {
-    WindowTiler.pushTileIntoTileContext(zoneX, zoneY, zoneWidth, zoneHeight,
+    this.pushTileIntoTileContext(zoneX, zoneY, zoneWidth, zoneHeight,
         tileContext);
     return tileContext;
   }
@@ -77,19 +73,19 @@ WindowTiler.computeTiles = function(tileContext, numWindows, zoneX, zoneY,
   var halfNumWindows = Math.floor(numWindows / 2);
   if (zoneWidth > zoneHeight) {
     var halfWidth = zoneWidth / 2;
-    tileContext = WindowTiler.computeTiles(tileContext, halfNumWindows,
+    tileContext = this.computeTiles(tileContext, halfNumWindows,
         zoneX, zoneY,
         halfWidth, zoneHeight);
-    tileContext = WindowTiler.computeTiles(tileContext,
+    tileContext = this.computeTiles(tileContext,
         numWindows - halfNumWindows,
         zoneX + halfWidth, zoneY,
         zoneWidth - halfWidth, zoneHeight);
   } else {
     var halfHeight = zoneHeight / 2;
-    tileContext = WindowTiler.computeTiles(tileContext, halfNumWindows,
+    tileContext = this.computeTiles(tileContext, halfNumWindows,
         zoneX, zoneY,
         zoneWidth, halfHeight);
-    tileContext = WindowTiler.computeTiles(tileContext,
+    tileContext = this.computeTiles(tileContext,
         numWindows - halfNumWindows,
         zoneX, zoneY + halfHeight,
         zoneWidth, zoneHeight - halfHeight);
@@ -99,12 +95,12 @@ WindowTiler.computeTiles = function(tileContext, numWindows, zoneX, zoneY,
 
 WindowTiler.prototype.tileWindows = function(windows) {
   var tileContext = [];
-  tileContext = WindowTiler.computeTiles(tileContext, windows.length, 0, 0,
+  tileContext = this.computeTiles(tileContext, windows.length, 0, 0,
       screen.width, screen.height);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
-    WindowTiler.repositionAndResizeWindow(windows[i].id, tile.left, tile.top,
-        tile.width, tile.height, WindowTiler.finished);
+    this.repositionAndResizeWindow(windows[i].id, tile.left, tile.top,
+        tile.width, tile.height, bind(this.finished, this));
   }
 }
 
