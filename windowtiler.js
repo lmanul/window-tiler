@@ -16,20 +16,11 @@ function bind(fn, scope) {
 WindowTiler = function() {};
 
 WindowTiler.prototype.start = function(tab) {
-  chrome.windows.getCurrent(bind(this.getWindows, this));
+  chrome.windows.getAll({"populate" : true}, bind(this.tileWindows, this));
 };
 
 WindowTiler.prototype.finished = function(myWindow) {
   // Do nothing for now.
-};
-
-WindowTiler.prototype.getWindows = function(win) {
-  chrome.tabs.getAllInWindow(win.id, bind(this.getTabs, this));
-};
-
-WindowTiler.prototype.getTabs = function(tabs) {
-  // We require all the tab information to be populated.
-  chrome.windows.getAll({"populate" : true}, bind(this.tileWindows, this));
 };
 
 WindowTiler.prototype.repositionAndResizeWindow = function(windowId, left, top,
