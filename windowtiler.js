@@ -15,8 +15,16 @@ function bind(fn, scope) {
 
 WindowTiler = function() {};
 
+WindowTiler.prototype.allWindows = null;
+
 WindowTiler.prototype.start = function(tab) {
-  chrome.windows.getAll({"populate" : true}, bind(this.tileWindows, this));
+  chrome.windows.getAll({"populate" : true},
+      bind(this.onReceivedWindowsData, this));
+};
+
+WindowTiler.prototype.onReceivedWindowsData = function(windows) {
+  this.allWindows = windows;
+  this.tileWindows(this.allWindows);
 };
 
 WindowTiler.prototype.finished = function(myWindow) {
