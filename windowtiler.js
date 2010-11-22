@@ -86,5 +86,3 @@ function tileWindows(windows) {
   }
 }
 
-// Set up a click handler so that we can tile all the windows.
-chrome.browserAction.onClicked.addListener(start);
