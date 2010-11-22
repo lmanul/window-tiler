@@ -4,7 +4,7 @@ WindowTiler = function() {};
 var targetWindow = null;
 var tabCount = 0;
 
-WindowTiler.start = function start(tab) {
+WindowTiler.prototype.start = function start(tab) {
   chrome.windows.getCurrent(WindowTiler.getWindows);
 };
 
