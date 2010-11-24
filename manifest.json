@@ -8,9 +8,9 @@
     "default_icon": "icon_19.png"
   },
   "icons": {
-	  "32": "icon_32.png",
-		"48": "icon_48.png"
-	},
+    "32": "icon_32.png",
+    "48": "icon_48.png"
+  },
   "permissions": [
     "tabs"
   ]
