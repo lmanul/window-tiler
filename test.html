@@ -17,7 +17,9 @@
     assert(windowTiler.compareAreas(smallArea, mediumArea) < 0);
     assert(windowTiler.compareAreas(bigArea, bigAreaCopy) == 0);
 
-    alert(success ? 'Success' : 'Failure');
+    var successDiv = document.getElementById('result');
+    var message = success ? 'Success' : 'Failure';
+    successDiv.innerHTML = '<span>' + message + '</span>';
   }
 
   function createArea(x, y, width, height) {
@@ -37,5 +39,6 @@
   </script>
 </head>
 <body onload="test()">
+  <div id="result"></div>
 </body>
 </html>
