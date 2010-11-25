@@ -18,16 +18,20 @@
     assert(windowTiler.compareAreas(smallArea, mediumArea) < 0);
     assert(windowTiler.compareAreas(bigArea, bigAreaCopy) == 0);
 
-    // Test for the computeTiles function.
-    var oneWindowFullScreenTileSet = [{
-      'left': 0,
-      'top': 0,
-      'width': 800,
-      'height': 600
-    }];
+    // Tests for the computeTiles function.
+    // One single window to tile the whole screen.
+    var oneWindowFullScreenTileSet = [createArea(0, 0, 800, 600)];
     var computedTileSet = windowTiler.computeTiles([], 1, 0, 0, 800, 600);
     assertTileSetsEqual(oneWindowFullScreenTileSet, computedTileSet);
 
+    // Two windows in a wide screen.
+    var twoWindowsInWideScreenTileSet = [
+        createArea(0, 0, 200, 100),
+        createArea(201, 0, 200, 100)];
+    computedTileSet = windowTiler.computeTiles([], 2, 0, 0, 400, 100);
+    assertTileSetsEqual(twoWindowsInWideScreenTileSet, computedTileSet);
+
+    // Propagate success or failure to the webpage.
     var successDiv = document.getElementById('result');
     var message = success ? 'Success' : 'Failure';
     successDiv.innerHTML = '<span>' + message + '</span>';
