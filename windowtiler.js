@@ -15,6 +15,7 @@ function bind(fn, scope) {
 
 /**
  * Creates a new window tiler.
+ * @constructor
  */
 WindowTiler = function() {};
 
@@ -24,13 +25,20 @@ WindowTiler = function() {};
  */
 WindowTiler.prototype.allWindows;
 
-WindowTiler.prototype.availableScreenRealEstate;
-
+/**
+ * Starts the whole process of tiling windows.
+ * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
+ */
 WindowTiler.prototype.start = function(tab) {
   chrome.windows.getAll({"populate" : true},
       bind(this.onReceivedWindowsData, this));
 };
 
+/**
+ * Utility function to compare 2-dimensionnal areas.
+ * @param {Object} a The first area.
+ * @param {Object} b The first area.
+ */
 WindowTiler.prototype.compareAreas = function(a, b) {
   if (a.width != b.width) {
     return a.width - b.width;
@@ -47,15 +55,35 @@ WindowTiler.prototype.compareAreas = function(a, b) {
   return 0;
 };
 
+/**
+ * Callback for when we received data about the currently open windows.
+ * @param {Array.<chrome.windows.Window>} windows The array of open windows.
+ */
 WindowTiler.prototype.onReceivedWindowsData = function(windows) {
   this.allWindows = windows;
   this.tileWindows(this.allWindows);
 };
 
+/**
+ * Callback for when we're finished resizing a window.
+ * @param {chrome.windows.Window} myWindow The window that has just finished
+ * resizing.
+ */
 WindowTiler.prototype.finished = function(myWindow) {
   // Do nothing for now.
 };
 
+/**
+ * Utility function to resize a window with the given window ID with the given
+ * dimensions, and call the given callback function.
+ * @param {number} windowId The ID of the window to resize.
+ * @param {number} left The left coordinate to use for the new geometry.
+ * @param {number} top The top position to use for the new geometry.
+ * @param {number} width The width to use for the new geometry.
+ * @param {number} height The height to use for the new geometry.
+ * @param {Function} callback The callback function to call once the window is
+ *     resized.
+ */
 WindowTiler.prototype.repositionAndResizeWindow = function(windowId, left, top,
     width, height, callback) {
   chrome.windows.update(windowId, {
@@ -66,6 +94,15 @@ WindowTiler.prototype.repositionAndResizeWindow = function(windowId, left, top,
   }, callback);
 };
 
+/**
+ * Adds a tile (which contains information about one of the tiles on the screen)
+ * into the current context (array of computed tiles).
+ * @param {number} left The left position to use for the added tile.
+ * @param {number} top The top position to use for the added tile.
+ * @param {number} width The width to use for the added tile.
+ * @param {number} height The height to use for the added tile.
+ * @param {Array.<Object>} tileContext The context to which to add the new tile.
+ */
 WindowTiler.prototype.pushTileIntoTileContext = function(left, top, width,
     height, tileContext) {
   tileContext.push({
@@ -77,6 +114,18 @@ WindowTiler.prototype.pushTileIntoTileContext = function(left, top, width,
   return tileContext;
 };
 
+/**
+ * Computes the relevant tiles and pushes them into the given tile context, for
+ * a zone on the screen defined by the arguments, and for the given number of
+ * windows to tile.
+ * @param {Array.<Object>} tileContext The tile context to which to add computed
+ *     tiles.
+ * @param {number} numWindows The number of windows left to tile.
+ * @param {number} zoneX The X coordinate of the zone remaining to tile.
+ * @param {number} zoneY The Y coordinate of the zone remaining to tile.
+ * @param {number} zoneWidth The width of the zone remaining to tile.
+ * @param {number} zoneHeight The height of the zone remaining to tile.
+ */
 WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
     zoneY, zoneWidth, zoneHeight) {
   if (window.console) {
@@ -118,6 +167,11 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
   return tileContext;
 };
 
+/**
+ * Tiles the windows given in an array as an argument over the available area
+ * on the screen.
+ * @param {chrome.windows.Window} windows The array of windows to tile.
+ */
 WindowTiler.prototype.tileWindows = function(windows) {
   var tileContext = [];
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
