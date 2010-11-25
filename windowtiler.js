@@ -25,6 +25,7 @@ WindowTiler = function() {};
  */
 WindowTiler.prototype.allWindows;
 
+
 /**
  * Starts the whole process of tiling windows.
  * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
@@ -33,6 +34,7 @@ WindowTiler.prototype.start = function(tab) {
   chrome.windows.getAll({"populate" : true},
       bind(this.onReceivedWindowsData, this));
 };
+
 
 /**
  * Utility function to compare 2-dimensionnal areas.
@@ -55,6 +57,7 @@ WindowTiler.prototype.compareAreas = function(a, b) {
   return 0;
 };
 
+
 /**
  * Callback for when we received data about the currently open windows.
  * @param {Array.<chrome.windows.Window>} windows The array of open windows.
@@ -64,6 +67,7 @@ WindowTiler.prototype.onReceivedWindowsData = function(windows) {
   this.tileWindows(this.allWindows);
 };
 
+
 /**
  * Callback for when we're finished resizing a window.
  * @param {chrome.windows.Window} myWindow The window that has just finished
@@ -72,6 +76,7 @@ WindowTiler.prototype.onReceivedWindowsData = function(windows) {
 WindowTiler.prototype.finished = function(myWindow) {
   // Do nothing for now.
 };
+
 
 /**
  * Utility function to resize a window with the given window ID with the given
@@ -94,6 +99,7 @@ WindowTiler.prototype.repositionAndResizeWindow = function(windowId, left, top,
   }, callback);
 };
 
+
 /**
  * Adds a tile (which contains information about one of the tiles on the screen)
  * into the current context (array of computed tiles).
@@ -113,6 +119,7 @@ WindowTiler.prototype.pushTileIntoTileContext = function(left, top, width,
   });
   return tileContext;
 };
+
 
 /**
  * Computes the relevant tiles and pushes them into the given tile context, for
@@ -166,6 +173,7 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
   }
   return tileContext;
 };
+
 
 /**
  * Tiles the windows given in an array as an argument over the available area
