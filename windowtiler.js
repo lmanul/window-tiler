@@ -3,21 +3,26 @@
 // keep a normal object-oriented paradigm the rest of the time.
 
 function toArray(obj) {
-    return Array.prototype.slice.call(obj);
+  return Array.prototype.slice.call(obj);
 }
 
-// Bind in its simplest form.
+/** Bind in its simplest form. */
 function bind(fn, scope) {
   return function () {
       return fn.apply(scope, toArray(arguments));
   };
 }
 
+/**
+ * Creates a new window tiler.
+ */
 WindowTiler = function() {};
 
+/**
+ * Array of all the windows for this instance of Chrome.
+ * @type {Array.<chrome.window.Window>}
+ */
 WindowTiler.prototype.allWindows;
-
-WindowTiler.prototype.measurementWindow;
 
 WindowTiler.prototype.availableScreenRealEstate;
 
@@ -44,23 +49,8 @@ WindowTiler.prototype.compareAreas = function(a, b) {
 
 WindowTiler.prototype.onReceivedWindowsData = function(windows) {
   this.allWindows = windows;
-  this.measurementWindow = this.allWindows[0];
-  if (this.measurementWindow) {
-    this.repositionAndResizeWindow(this.measurementWindow.id, 0, 0,
-        screen.width, screen.height,
-        bind(this.onMeasurementWindowResized, this));
-  }
-};
-
-WindowTiler.prototype.onMeasurementWindowResized = function(measurementWindow) {
-  this.availableScreenRealEstate = {
-    'top': measurementWindow.top,
-    'left': measurementWindow.left,
-    'width': measurementWindow.width,
-    'height': measurementWindow.height
-  };
   this.tileWindows(this.allWindows);
-}
+};
 
 WindowTiler.prototype.finished = function(myWindow) {
   // Do nothing for now.
@@ -130,12 +120,9 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
 
 WindowTiler.prototype.tileWindows = function(windows) {
   var tileContext = [];
+  // TODO: screen.avail* properties do not work well on Linux/GNOME.
   tileContext = this.computeTiles(tileContext, windows.length,
       screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight);
-      //this.availableScreenRealEstate.left,
-      //this.availableScreenRealEstate.top,
-      //this.availableScreenRealEstate.width,
-      //this.availableScreenRealEstate.height);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
     this.repositionAndResizeWindow(windows[i].id, tile.left, tile.top,
