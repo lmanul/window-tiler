@@ -24,12 +24,19 @@
     var computedTileSet = windowTiler.computeTiles([], 1, 0, 0, 800, 600);
     assertTileSetsEqual(oneWindowFullScreenTileSet, computedTileSet);
 
-    // Two windows in a wide screen.
+    // Two windows in a wide screen. The screen should be split vertically.
     var twoWindowsInWideScreenTileSet = [
         createArea(0, 0, 200, 100),
         createArea(201, 0, 200, 100)];
     computedTileSet = windowTiler.computeTiles([], 2, 0, 0, 400, 100);
     assertTileSetsEqual(twoWindowsInWideScreenTileSet, computedTileSet);
+
+    // Two windows in a high screen. The screen should be split horizontally.
+    var twoWindowsInHighScreenTileSet = [
+        createArea(0, 0, 100, 200),
+        createArea(0, 201, 100, 200)];
+    computedTileSet = windowTiler.computeTiles([], 2, 0, 0, 100, 400);
+    assertTileSetsEqual(twoWindowsInHighScreenTileSet, computedTileSet);
 
     // Propagate success or failure to the webpage.
     var successDiv = document.getElementById('result');
