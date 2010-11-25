@@ -12,14 +12,49 @@
     var smallArea = createArea(0, 0, 640, 480);
     var bigAreaCopy = createArea(0, 0, 1280, 1024);
 
+    // Tests for the compareAreas function.
     assert(windowTiler.compareAreas(bigArea, smallArea) > 0);
     assert(windowTiler.compareAreas(bigArea, mediumArea) > 0);
     assert(windowTiler.compareAreas(smallArea, mediumArea) < 0);
     assert(windowTiler.compareAreas(bigArea, bigAreaCopy) == 0);
 
+    // Test for the computeTiles function.
+    var oneWindowFullScreenTileSet = [{
+      'left': 0,
+      'top': 0,
+      'width': 800,
+      'height': 600
+    }];
+    var computedTileSet = windowTiler.computeTiles([], 1, 0, 0, 800, 600);
+    assertTileSetsEqual(oneWindowFullScreenTileSet, computedTileSet);
+
     var successDiv = document.getElementById('result');
     var message = success ? 'Success' : 'Failure';
     successDiv.innerHTML = '<span>' + message + '</span>';
+  }
+
+  function assertTileSetsEqual(setA, setB) {
+    if (setA.length != setB.length) {
+      success = false;
+    }
+    for (var i = 0; i < setA.length; i++) {
+      assertTilesEqual(setA[i], setB[i]);
+    }
+  }
+
+  function assertTilesEqual(tileA, tileB) {
+    if (tileA.left != tileB.left) {
+      success = false;
+    }
+    if (tileA.top != tileB.top) {
+      success = false;
+    }
+    if (tileA.width != tileB.width) {
+      success = false;
+    }
+    if (tileA.height != tileB.height) {
+      success = false;
+    }
   }
 
   function createArea(x, y, width, height) {
