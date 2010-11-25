@@ -12,18 +12,21 @@
     var smallArea = createArea(0, 0, 640, 480);
     var bigAreaCopy = createArea(0, 0, 1280, 1024);
 
+    ///////////////////////////////////////////////////////////////////////////
     window.console.log('compareAreas');
     assert(windowTiler.compareAreas(bigArea, smallArea) > 0);
     assert(windowTiler.compareAreas(bigArea, mediumArea) > 0);
     assert(windowTiler.compareAreas(smallArea, mediumArea) < 0);
     assert(windowTiler.compareAreas(bigArea, bigAreaCopy) == 0);
 
+    ///////////////////////////////////////////////////////////////////////////
     window.console.log('computeTiles');
     window.console.log('One Single Window');
     var oneWindowFullScreenTileSet = [createArea(0, 0, 800, 600)];
     var computedTileSet = windowTiler.computeTiles([], 1, 0, 0, 800, 600);
     assertTileSetsEqual(oneWindowFullScreenTileSet, computedTileSet);
 
+    ///////////////////////////////////////////////////////////////////////////
     window.console.log('Two windows in wide screen');
     var twoWindowsInWideScreenTileSet = [
         createArea(0, 0, 200, 100),
@@ -31,6 +34,7 @@
     computedTileSet = windowTiler.computeTiles([], 2, 0, 0, 400, 100);
     assertTileSetsEqual(twoWindowsInWideScreenTileSet, computedTileSet);
 
+    ///////////////////////////////////////////////////////////////////////////
     window.console.log('Two windows in high screen');
     var twoWindowsInHighScreenTileSet = [
         createArea(0, 0, 100, 200),
@@ -38,6 +42,7 @@
     computedTileSet = windowTiler.computeTiles([], 2, 0, 0, 100, 400);
     assertTileSetsEqual(twoWindowsInHighScreenTileSet, computedTileSet);
 
+    ///////////////////////////////////////////////////////////////////////////
     window.console.log('Four windows');
     var fourWindowsTileSet = [
         createArea(0, 0, 100, 100),
