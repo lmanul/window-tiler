@@ -9,7 +9,7 @@
   },
   "icons": {
     "32": "icon_32.png",
-    "48": "icon_48.png"
+    "48": "icon_48.png",
     "72": "icon_72.png"
   },
   "permissions": [
