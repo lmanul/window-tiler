@@ -1,6 +1,6 @@
 {
   "name": "Window Tiler",
-  "version": "0.12",
+  "version": "0.2",
   "description": "Tile your windows with a single click.",
   "background_page": "background.html",
   "browser_action": {
@@ -10,7 +10,8 @@
   "icons": {
     "32": "icon_32.png",
     "48": "icon_48.png",
-    "72": "icon_72.png"
+    "72": "icon_72.png",
+    "128": "icon_128.png"
   },
   "permissions": [
     "tabs"

@@ -63,7 +63,7 @@ WindowTiler.prototype.compareAreas = function(a, b) {
  * @param {Array.<chrome.windows.Window>} windows The array of open windows.
  */
 WindowTiler.prototype.onReceivedWindowsData = function(windows) {
-  this.allWindows = windows;
+  this.allWindows = getNonMinimizedWindows(windows);
   this.tileWindows(this.allWindows);
 };
 
@@ -77,6 +77,16 @@ WindowTiler.prototype.finished = function(myWindow) {
   // Do nothing for now.
 };
 
+
+WindowTiler.prototype.getNonMinimizedWindows = function(windowsParam) {
+  var nonMinimizedWindows = [];
+  for (var i = 0; i < windowsParam.length; i++) {
+    if (windowsParam[i].state != 'minimized') {
+      nonMinimizedWindows.push(windowsParam[i]);
+    }
+  }
+  return nonMinimizedWindows;
+};
 
 /**
  * Utility function to resize a window with the given window ID with the given
@@ -95,7 +105,8 @@ WindowTiler.prototype.repositionAndResizeWindow = function(windowId, left, top,
     'left': left,
     'top': top,
     'width': width,
-    'height': height
+    'height': height,
+    'state': 'normal'
   }, callback);
 };
 
@@ -180,15 +191,16 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
  * on the screen.
  * @param {chrome.windows.Window} windows The array of windows to tile.
  */
-WindowTiler.prototype.tileWindows = function(windows) {
+WindowTiler.prototype.tileWindows = function(windowsParam) {
   var tileContext = [];
+  var nonMinimizedWindows = getNonMinimizedWindows(windowsParam);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
-  tileContext = this.computeTiles(tileContext, windows.length,
+  tileContext = this.computeTiles(tileContext, nonMinimizedWindows.length,
       screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
-    this.repositionAndResizeWindow(windows[i].id, tile.left, tile.top,
-        tile.width, tile.height, bind(this.finished, this));
+    this.repositionAndResizeWindow(nonMinimizedWindows[i].id, tile.left,
+        tile.top, tile.width, tile.height, bind(this.finished, this));
   }
 }
 
