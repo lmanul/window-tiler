@@ -63,7 +63,7 @@ WindowTiler.prototype.compareAreas = function(a, b) {
  * @param {Array.<chrome.windows.Window>} windows The array of open windows.
  */
 WindowTiler.prototype.onReceivedWindowsData = function(windows) {
-  this.allWindows = getNonMinimizedWindows(windows);
+  this.allWindows = this.getNonMinimizedWindows(windows);
   this.tileWindows(this.allWindows);
 };
 
@@ -193,7 +193,7 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
  */
 WindowTiler.prototype.tileWindows = function(windowsParam) {
   var tileContext = [];
-  var nonMinimizedWindows = getNonMinimizedWindows(windowsParam);
+  var nonMinimizedWindows = this.getNonMinimizedWindows(windowsParam);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
   tileContext = this.computeTiles(tileContext, nonMinimizedWindows.length,
       screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight);
