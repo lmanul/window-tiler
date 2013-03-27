@@ -13,6 +13,8 @@ function bind(fn, scope) {
   };
 }
 
+
+
 /**
  * Creates a new window tiler.
  * @constructor
@@ -31,7 +33,7 @@ WindowTiler.prototype.allWindows;
  * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
  */
 WindowTiler.prototype.start = function(tab) {
-  chrome.windows.getAll({"populate" : true},
+  chrome.windows.getAll({"populate" : false},
       bind(this.onReceivedWindowsData, this));
 };
 
@@ -64,7 +66,10 @@ WindowTiler.prototype.compareAreas = function(a, b) {
  */
 WindowTiler.prototype.onReceivedWindowsData = function(windows) {
   this.allWindows = this.getNonMinimizedWindows(windows);
-  this.tileWindows(this.allWindows);
+  this.tileWindows();
+  // Somehow, doing the tiling only once doesn't always work. Let's do it
+  // again after a short period.
+  window.setTimeout(bind(this.tileWindows, this), 300);
 };
 
 
@@ -101,6 +106,8 @@ WindowTiler.prototype.getNonMinimizedWindows = function(windowsParam) {
  */
 WindowTiler.prototype.repositionAndResizeWindow = function(windowId, left, top,
     width, height, callback) {
+  window.console.log('Repositioning window ' + windowId + ' to ' +
+      width + 'x' + height + ' + (' + left + ', ' + top + ')') ;
   chrome.windows.update(windowId, {
     'left': left,
     'top': top,
@@ -189,11 +196,10 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
 /**
  * Tiles the windows given in an array as an argument over the available area
  * on the screen.
- * @param {chrome.windows.Window} windows The array of windows to tile.
  */
-WindowTiler.prototype.tileWindows = function(windowsParam) {
+WindowTiler.prototype.tileWindows = function() {
   var tileContext = [];
-  var nonMinimizedWindows = this.getNonMinimizedWindows(windowsParam);
+  var nonMinimizedWindows = this.getNonMinimizedWindows(this.allWindows);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
   tileContext = this.computeTiles(tileContext, nonMinimizedWindows.length,
       screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight);
@@ -203,4 +209,3 @@ WindowTiler.prototype.tileWindows = function(windowsParam) {
         tile.top, tile.width, tile.height, bind(this.finished, this));
   }
 }
-
