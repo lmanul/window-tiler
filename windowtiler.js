@@ -60,13 +60,23 @@ WindowTiler.prototype.compareAreas = function(a, b) {
 };
 
 
+WindowTiler.prototype.windowIsWithinScreen = function(theWindow) {
+  // Even though a window's top left corner can be outside the screen, we're
+  // going to use that as a proxy. It doesn't matter if the window's bottom
+  // right corner extends outside the screen.
+  return theWindow.left >= screen.availLeft &&
+      theWindow.left <= screen.availLeft + screen.width &&
+      theWindow.top >= screen.availTop &&
+      theWindow.top <= screen.availTop + screen.height;
+};
+
 /**
  * Callback for when we received data about the currently open windows.
  * @param {Array.<chrome.windows.Window>} windows The array of open windows.
  */
-WindowTiler.prototype.onReceivedWindowsData = function(windows) {
-  this.allWindows = this.getNonMinimizedWindows(windows);
-  this.tileWindows();
+WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
+  this.allWindows = windowsParam;
+  this.tileWindows(true /* firstTime*/);
   // Somehow, doing the tiling only once doesn't always work. Let's do it
   // again after a short period.
   window.setTimeout(bind(this.tileWindows, this), 300);
@@ -83,15 +93,24 @@ WindowTiler.prototype.finished = function(myWindow) {
 };
 
 
-WindowTiler.prototype.getNonMinimizedWindows = function(windowsParam) {
-  var nonMinimizedWindows = [];
+WindowTiler.prototype.windowIsNonMinimized = function(theWindow) {
+  return theWindow.state != 'minimized';
+};
+
+
+WindowTiler.prototype.filterWindows = function(windowsParam, filters) {
+  var filtered = [];
   for (var i = 0; i < windowsParam.length; i++) {
-    if (windowsParam[i].state != 'minimized') {
-      nonMinimizedWindows.push(windowsParam[i]);
+    var shouldAdd = true;
+    for (var j = 0; j < filters.length; j++) {
+      shouldAdd &= filters[j](windowsParam[i]);
+    }
+    if (shouldAdd) {
+      filtered.push(windowsParam[i]);
     }
   }
-  return nonMinimizedWindows;
-};
+  return filtered;
+}
 
 /**
  * Utility function to resize a window with the given window ID with the given
@@ -196,16 +215,33 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
 /**
  * Tiles the windows given in an array as an argument over the available area
  * on the screen.
+ * @param {boolean} firstTime
  */
-WindowTiler.prototype.tileWindows = function() {
+WindowTiler.prototype.tileWindows = function(firstTime) {
   var tileContext = [];
-  var nonMinimizedWindows = this.getNonMinimizedWindows(this.allWindows);
+  var filters = [];
+  filters.push(this.windowIsNonMinimized);
+  filters.push(this.windowIsWithinScreen);
+  var windowsThatAreNotWithinScreen = [];
+  for (var i = 0; i < this.allWindows.length; i++) {
+    if (!this.windowIsWithinScreen(this.allWindows[i])) {
+      windowsThatAreNotWithinScreen.push(this.allWindows[i]);
+    }
+  }
+  if (firstTime && windowsThatAreNotWithinScreen.length > 0) {
+    alert(windowsThatAreNotWithinScreen.length + ' windows are outside of ' +
+        'your main screen, and the information currently provided by Chrome ' +
+        'does not allow this extension to handle multiple monitors. ' +
+        'I will only tile windows that are on your main screen. Sorry about ' +
+        'that!');
+  }
+  var filteredWindows = this.filterWindows(this.allWindows, filters);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
-  tileContext = this.computeTiles(tileContext, nonMinimizedWindows.length,
+  tileContext = this.computeTiles(tileContext, filteredWindows.length,
       screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
-    this.repositionAndResizeWindow(nonMinimizedWindows[i].id, tile.left,
+    this.repositionAndResizeWindow(filteredWindows[i].id, tile.left,
         tile.top, tile.width, tile.height, bind(this.finished, this));
   }
 }
