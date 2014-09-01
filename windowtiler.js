@@ -21,6 +21,7 @@ function bind(fn, scope) {
  */
 WindowTiler = function() {};
 
+
 /**
  * Array of all the windows for this instance of Chrome.
  * @type {Array.<chrome.window.Window>}
@@ -36,6 +37,7 @@ WindowTiler.prototype.start = function(tab) {
   chrome.system.display.getInfo(bind(this.onReceivedDisplayData, this));
 };
 
+
 WindowTiler.prototype.onReceivedDisplayData = function(screens) {
   for (var i = 0, scr = null; scr = screens[i]; i++) {
     window.console.log(scr);
@@ -43,6 +45,7 @@ WindowTiler.prototype.onReceivedDisplayData = function(screens) {
   chrome.windows.getAll({"populate" : false},
       bind(this.onReceivedWindowsData, this));
 };
+
 
 /**
  * Utility function to compare 2-dimensionnal areas.
@@ -75,6 +78,7 @@ WindowTiler.prototype.windowIsWithinScreen = function(theWindow) {
       theWindow.top >= screen.availTop &&
       theWindow.top <= screen.availTop + screen.height;
 };
+
 
 /**
  * Callback for when we received data about the currently open windows.
@@ -117,6 +121,7 @@ WindowTiler.prototype.filterWindows = function(windowsParam, filters) {
   }
   return filtered;
 }
+
 
 /**
  * Utility function to resize a window with the given window ID with the given
