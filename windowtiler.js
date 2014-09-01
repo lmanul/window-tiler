@@ -33,10 +33,16 @@ WindowTiler.prototype.allWindows;
  * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
  */
 WindowTiler.prototype.start = function(tab) {
+  chrome.system.display.getInfo(bind(this.onReceivedDisplayData, this));
+};
+
+WindowTiler.prototype.onReceivedDisplayData = function(screens) {
+  for (var i = 0, scr = null; scr = screens[i]; i++) {
+    window.console.log(scr);
+  }
   chrome.windows.getAll({"populate" : false},
       bind(this.onReceivedWindowsData, this));
 };
-
 
 /**
  * Utility function to compare 2-dimensionnal areas.

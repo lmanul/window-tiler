@@ -17,6 +17,7 @@
     "128": "icon_128.png"
   },
   "permissions": [
+    "system.display",
     "tabs"
   ]
 }
