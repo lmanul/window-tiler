@@ -1,5 +1,6 @@
 <html>
 <head>
+  <script src="util.js"></script>
   <script src="windowtiler.js"></script>
   <script>
   var windowTiler = new WindowTiler();
@@ -14,10 +15,10 @@
 
     ///////////////////////////////////////////////////////////////////////////
     window.console.log('compareAreas');
-    assert(windowTiler.compareAreas(bigArea, smallArea) > 0);
-    assert(windowTiler.compareAreas(bigArea, mediumArea) > 0);
-    assert(windowTiler.compareAreas(smallArea, mediumArea) < 0);
-    assert(windowTiler.compareAreas(bigArea, bigAreaCopy) == 0);
+    assert(WindowTilerUtils.compareAreas(bigArea, smallArea) > 0);
+    assert(WindowTilerUtils.compareAreas(bigArea, mediumArea) > 0);
+    assert(WindowTilerUtils.compareAreas(smallArea, mediumArea) < 0);
+    assert(WindowTilerUtils.compareAreas(bigArea, bigAreaCopy) == 0);
 
     ///////////////////////////////////////////////////////////////////////////
     window.console.log('computeTiles');
