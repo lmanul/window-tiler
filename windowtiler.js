@@ -47,28 +47,6 @@ WindowTiler.prototype.onReceivedDisplayData = function(screens) {
 };
 
 
-/**
- * Utility function to compare 2-dimensionnal areas.
- * @param {Object} a The first area.
- * @param {Object} b The first area.
- */
-WindowTiler.prototype.compareAreas = function(a, b) {
-  if (a.width != b.width) {
-    return a.width - b.width;
-  }
-  if (a.height != b.height) {
-    return a.height - b.height;
-  }
-  if (a.left != b.left) {
-    return a.left - b.left;
-  }
-  if (a.top != b.top) {
-    return a.top - b.top;
-  }
-  return 0;
-};
-
-
 WindowTiler.prototype.windowIsWithinScreen = function(theWindow) {
   // Even though a window's top left corner can be outside the screen, we're
   // going to use that as a proxy. It doesn't matter if the window's bottom
