@@ -1,3 +1,5 @@
+WindowTilerUtils = function() {};
+
 /**
  * Utility function to compare 2-dimensionnal areas.
  * @param {Object} a The first area.

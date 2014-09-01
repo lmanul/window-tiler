@@ -30,6 +30,13 @@ WindowTiler.prototype.allWindows;
 
 
 /**
+ * Array of all the screens for this instance of Chrome.
+ * @type {Array.<Object>}
+ */
+WindowTiler.prototype.screens;
+
+
+/**
  * Starts the whole process of tiling windows.
  * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
  */
@@ -39,7 +46,8 @@ WindowTiler.prototype.start = function(tab) {
 
 
 WindowTiler.prototype.onReceivedDisplayData = function(screens) {
-  for (var i = 0, scr = null; scr = screens[i]; i++) {
+  this.screens = screens;
+  for (var i = 0, scr = null; scr = this.screens[i]; i++) {
     window.console.log(scr);
   }
   chrome.windows.getAll({"populate" : false},
