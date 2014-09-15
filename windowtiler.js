@@ -73,10 +73,25 @@ WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
         'that!');
   }
   var filteredWindows = this.filterWindows(windowsParam, filters);
-  this.tileWindows(filteredWindows);
+
+  var mainScreen;
+  for (var i = 0, screen; screen = this.screens[0]; i++) {
+    if (screen.isPrimary) {
+      mainScreen = screen;
+      break;
+    }
+  }
+
+  if (!mainScreen) {
+    alert('I cannot find the main screen! I\'m going to stop here, sorry.');
+    return;
+  }
+
+  this.tileWindows(filteredWindows, mainScreen);
   // Somehow, doing the tiling only once doesn't always work. Let's do it
   // again after a short period.
-  window.setTimeout(this.tileWindows.bind(this, filteredWindows), 300);
+  window.setTimeout(this.tileWindows.bind(this, filteredWindows, mainScreen),
+      300);
 };
 
 
@@ -214,11 +229,14 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
  * Tiles the windows given in an array as an argument over the available area
  * on the screen.
  */
-WindowTiler.prototype.tileWindows = function(filteredWindows) {
+WindowTiler.prototype.tileWindows = function(filteredWindows, screen) {
   var tileContext = [];
+  window.console.log('Tiling windows on screen ');
+  window.console.log(screen);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
   tileContext = this.computeTiles(tileContext, filteredWindows.length,
-      screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight);
+      screen.bounds.left, screen.bounds.top,
+      screen.bounds.width, screen.bounds.height);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
     this.repositionAndResizeWindow(filteredWindows[i].id, tile.left,
