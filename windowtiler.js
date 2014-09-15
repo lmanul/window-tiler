@@ -75,7 +75,7 @@ WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
   var filteredWindows = this.filterWindows(windowsParam, filters);
 
   var mainScreen;
-  for (var i = 0, screen; screen = this.screens[0]; i++) {
+  for (var i = 0, screen; screen = this.screens[i]; i++) {
     if (screen.isPrimary) {
       mainScreen = screen;
       break;
