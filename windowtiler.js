@@ -15,13 +15,6 @@ WindowTiler = function() {};
 
 
 /**
- * Array of all the windows for this instance of Chrome.
- * @type {Array.<chrome.window.Window>}
- */
-WindowTiler.prototype.allWindows;
-
-
-/**
  * Array of all the screens for this instance of Chrome.
  * @type {Array.<Object>}
  */
@@ -63,15 +56,13 @@ WindowTiler.prototype.windowIsWithinScreen = function(theWindow) {
  * @param {Array.<chrome.windows.Window>} windows The array of open windows.
  */
 WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
-  this.allWindows = windowsParam;
-  
   var filters = [];
   filters.push(this.windowIsNonMinimized);
   filters.push(this.windowIsWithinScreen);
   var windowsThatAreNotWithinScreen = [];
-  for (var i = 0; i < this.allWindows.length; i++) {
-    if (!this.windowIsWithinScreen(this.allWindows[i])) {
-      windowsThatAreNotWithinScreen.push(this.allWindows[i]);
+  for (var i = 0; i < windowsParam.length; i++) {
+    if (!this.windowIsWithinScreen(windowsParam[i])) {
+      windowsThatAreNotWithinScreen.push(windowsParam[i]);
     }
   }
   if (windowsThatAreNotWithinScreen.length > 0) {
@@ -81,7 +72,7 @@ WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
         'I will only tile windows that are on your main screen. Sorry about ' +
         'that!');
   }
-  var filteredWindows = this.filterWindows(this.allWindows, filters);
+  var filteredWindows = this.filterWindows(windowsParam, filters);
   this.tileWindows(filteredWindows);
   // Somehow, doing the tiling only once doesn't always work. Let's do it
   // again after a short period.
