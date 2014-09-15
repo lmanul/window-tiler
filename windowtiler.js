@@ -6,14 +6,6 @@ function toArray(obj) {
   return Array.prototype.slice.call(obj);
 }
 
-/** Bind in its simplest form. */
-function bind(fn, scope) {
-  return function () {
-      return fn.apply(scope, toArray(arguments));
-  };
-}
-
-
 
 /**
  * Creates a new window tiler.
@@ -41,7 +33,7 @@ WindowTiler.prototype.screens;
  * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
  */
 WindowTiler.prototype.start = function(tab) {
-  chrome.system.display.getInfo(bind(this.onReceivedDisplayData, this));
+  chrome.system.display.getInfo(this.onReceivedDisplayData.bind(this));
 };
 
 
@@ -51,7 +43,7 @@ WindowTiler.prototype.onReceivedDisplayData = function(screens) {
     window.console.log(scr);
   }
   chrome.windows.getAll({"populate" : false},
-      bind(this.onReceivedWindowsData, this));
+      this.onReceivedWindowsData.bind(this));
 };
 
 
@@ -72,10 +64,28 @@ WindowTiler.prototype.windowIsWithinScreen = function(theWindow) {
  */
 WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
   this.allWindows = windowsParam;
-  this.tileWindows(true /* firstTime*/);
+  
+  var filters = [];
+  filters.push(this.windowIsNonMinimized);
+  filters.push(this.windowIsWithinScreen);
+  var windowsThatAreNotWithinScreen = [];
+  for (var i = 0; i < this.allWindows.length; i++) {
+    if (!this.windowIsWithinScreen(this.allWindows[i])) {
+      windowsThatAreNotWithinScreen.push(this.allWindows[i]);
+    }
+  }
+  if (windowsThatAreNotWithinScreen.length > 0) {
+    alert(windowsThatAreNotWithinScreen.length + ' windows are outside of ' +
+        'your main screen, and the information currently provided by Chrome ' +
+        'does not allow this extension to handle multiple monitors. ' +
+        'I will only tile windows that are on your main screen. Sorry about ' +
+        'that!');
+  }
+  var filteredWindows = this.filterWindows(this.allWindows, filters);
+  this.tileWindows(filteredWindows);
   // Somehow, doing the tiling only once doesn't always work. Let's do it
   // again after a short period.
-  window.setTimeout(bind(this.tileWindows, this), 300);
+  window.setTimeout(this.tileWindows.bind(this, filteredWindows), 300);
 };
 
 
@@ -212,33 +222,15 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
 /**
  * Tiles the windows given in an array as an argument over the available area
  * on the screen.
- * @param {boolean} firstTime
  */
-WindowTiler.prototype.tileWindows = function(firstTime) {
+WindowTiler.prototype.tileWindows = function(filteredWindows) {
   var tileContext = [];
-  var filters = [];
-  filters.push(this.windowIsNonMinimized);
-  filters.push(this.windowIsWithinScreen);
-  var windowsThatAreNotWithinScreen = [];
-  for (var i = 0; i < this.allWindows.length; i++) {
-    if (!this.windowIsWithinScreen(this.allWindows[i])) {
-      windowsThatAreNotWithinScreen.push(this.allWindows[i]);
-    }
-  }
-  if (firstTime && windowsThatAreNotWithinScreen.length > 0) {
-    alert(windowsThatAreNotWithinScreen.length + ' windows are outside of ' +
-        'your main screen, and the information currently provided by Chrome ' +
-        'does not allow this extension to handle multiple monitors. ' +
-        'I will only tile windows that are on your main screen. Sorry about ' +
-        'that!');
-  }
-  var filteredWindows = this.filterWindows(this.allWindows, filters);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
   tileContext = this.computeTiles(tileContext, filteredWindows.length,
       screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
     this.repositionAndResizeWindow(filteredWindows[i].id, tile.left,
-        tile.top, tile.width, tile.height, bind(this.finished, this));
+        tile.top, tile.width, tile.height, (this.finished.bind(this)));
   }
 }
