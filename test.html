@@ -53,6 +53,12 @@
     computedTileSet = windowTiler.computeTiles([], 4, 0, 0, 200, 200);
     assertTileSetsEqual(fourWindowsTileSet, computedTileSet);
 
+    ///////////////////////////////////////////////////////////////////////////
+    window.console.log('Rectangle intersection');
+    var overlap = WindowTilerUtils.rectangleOverlap(5, 5, 10, 5,
+        8, 10, 9, 7);
+    assert(overlap == 10);
+
     // Propagate success or failure to the webpage.
     var successDiv = document.getElementById('result');
     var message = success ? 'Success' : 'Failure';
