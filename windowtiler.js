@@ -51,6 +51,30 @@ WindowTiler.prototype.windowIsWithinScreen = function(theWindow) {
 };
 
 
+WindowTiler.prototype.findWindowsOnThisScreen = function(theWindows,
+    theScreen, allScreens) {
+  var windowsOnSelectedScreen = [];
+
+  for (var eachWindow, i = 0; eachWindow = theWindows[i]; i++) {
+    var maxOverlap = 0;
+    var screenWithMaxOverlap;
+    for (var eachScreen, j = 0; eachScreen = allScreens[j]; i++) {
+      var overlap = WindowTilerUtils.rectangleOverlap(
+          eachWindow.top, eachWindow.left, eachWindow.width, theWindow.height,
+          eachScreen.top, eachScreen.left, eachScreen.width, eachScreen.height);
+      if (overlap >= maxOverlap) {
+         maxOverlap = overlap;
+         screenWithMaxOverlap = eachScreen;
+      }
+    }
+    if (screenWithMaxOverlap == theScreen) {
+      windowsOnSelectedScreen.push(eachWindow);
+    }
+  }
+  return windowsOnSelectedScreen;
+};
+
+
 /**
  * Callback for when we received data about the currently open windows.
  * @param {Array.<chrome.windows.Window>} windows The array of open windows.
