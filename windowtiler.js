@@ -40,17 +40,6 @@ WindowTiler.prototype.onReceivedDisplayData = function(screens) {
 };
 
 
-WindowTiler.prototype.windowIsWithinScreen = function(theWindow) {
-  // Even though a window's top left corner can be outside the screen, we're
-  // going to use that as a proxy. It doesn't matter if the window's bottom
-  // right corner extends outside the screen.
-  return theWindow.left >= screen.availLeft &&
-      theWindow.left <= screen.availLeft + screen.width &&
-      theWindow.top >= screen.availTop &&
-      theWindow.top <= screen.availTop + screen.height;
-};
-
-
 WindowTiler.prototype.findWindowsOnThisScreen = function(theWindows,
     theScreen, allScreens) {
   var windowsOnSelectedScreen = [];
@@ -58,10 +47,11 @@ WindowTiler.prototype.findWindowsOnThisScreen = function(theWindows,
   for (var eachWindow, i = 0; eachWindow = theWindows[i]; i++) {
     var maxOverlap = 0;
     var screenWithMaxOverlap;
-    for (var eachScreen, j = 0; eachScreen = allScreens[j]; i++) {
+    for (var eachScreen, j = 0; eachScreen = allScreens[j]; j++) {
       var overlap = WindowTilerUtils.rectangleOverlap(
-          eachWindow.top, eachWindow.left, eachWindow.width, theWindow.height,
-          eachScreen.top, eachScreen.left, eachScreen.width, eachScreen.height);
+          eachWindow.top, eachWindow.left, eachWindow.width, eachWindow.height,
+          eachScreen.bounds.top, eachScreen.bounds.left,
+              eachScreen.bounds.width, eachScreen.bounds.height);
       if (overlap >= maxOverlap) {
          maxOverlap = overlap;
          screenWithMaxOverlap = eachScreen;
@@ -82,26 +72,12 @@ WindowTiler.prototype.findWindowsOnThisScreen = function(theWindows,
 WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
   var filters = [];
   filters.push(this.windowIsNonMinimized);
-  filters.push(this.windowIsWithinScreen);
-  var windowsThatAreNotWithinScreen = [];
-  for (var i = 0; i < windowsParam.length; i++) {
-    if (!this.windowIsWithinScreen(windowsParam[i])) {
-      windowsThatAreNotWithinScreen.push(windowsParam[i]);
-    }
-  }
-  if (windowsThatAreNotWithinScreen.length > 0) {
-    alert(windowsThatAreNotWithinScreen.length + ' windows are outside of ' +
-        'your main screen, and the information currently provided by Chrome ' +
-        'does not allow this extension to handle multiple monitors. ' +
-        'I will only tile windows that are on your main screen. Sorry about ' +
-        'that!');
-  }
   var filteredWindows = this.filterWindows(windowsParam, filters);
 
   var mainScreen;
-  for (var i = 0, screen; screen = this.screens[i]; i++) {
-    if (screen.isPrimary) {
-      mainScreen = screen;
+  for (var i = 0, eachScreen; eachScreen = this.screens[i]; i++) {
+    if (eachScreen.isPrimary) {
+      mainScreen = eachScreen;
       break;
     }
   }
@@ -111,11 +87,16 @@ WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
     return;
   }
 
-  this.tileWindows(filteredWindows, mainScreen);
-  // Somehow, doing the tiling only once doesn't always work. Let's do it
-  // again after a short period.
-  window.setTimeout(this.tileWindows.bind(this, filteredWindows, mainScreen),
-      300);
+  for (var i = 0, eachScreen; eachScreen = this.screens[i]; i++) {
+    var windowsForThisScreen = this.findWindowsOnThisScreen(filteredWindows,
+        eachScreen, this.screens);
+
+    this.tileWindows(windowsForThisScreen, eachScreen);
+    // Somehow, doing the tiling only once doesn't always work. Let's do it
+    // again after a short period.
+    window.setTimeout(
+        this.tileWindows.bind(this, windowsForThisScreen, eachScreen), 300);
+  }
 };
 
 
@@ -253,17 +234,17 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
  * Tiles the windows given in an array as an argument over the available area
  * on the screen.
  */
-WindowTiler.prototype.tileWindows = function(filteredWindows, screen) {
+WindowTiler.prototype.tileWindows = function(theWindows, theScreen) {
   var tileContext = [];
-  window.console.log('Tiling windows on screen ');
-  window.console.log(screen);
+  window.console.log('Tiling ' + theWindows.length + ' windows on screen ');
+  window.console.log(theScreen);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
-  tileContext = this.computeTiles(tileContext, filteredWindows.length,
-      screen.bounds.left, screen.bounds.top,
-      screen.bounds.width, screen.bounds.height);
+  tileContext = this.computeTiles(tileContext, theWindows.length,
+      theScreen.bounds.left, theScreen.bounds.top,
+      theScreen.bounds.width, theScreen.bounds.height);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
-    this.repositionAndResizeWindow(filteredWindows[i].id, tile.left,
+    this.repositionAndResizeWindow(theWindows[i].id, tile.left,
         tile.top, tile.width, tile.height, (this.finished.bind(this)));
   }
 }
