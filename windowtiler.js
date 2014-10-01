@@ -92,10 +92,6 @@ WindowTiler.prototype.onReceivedWindowsData = function(windowsParam) {
         eachScreen, this.screens);
 
     this.tileWindows(windowsForThisScreen, eachScreen);
-    // Somehow, doing the tiling only once doesn't always work. Let's do it
-    // again after a short period.
-    window.setTimeout(
-        this.tileWindows.bind(this, windowsForThisScreen, eachScreen), 300);
   }
 };
 
