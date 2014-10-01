@@ -32,9 +32,6 @@ WindowTiler.prototype.start = function(tab) {
 
 WindowTiler.prototype.onReceivedDisplayData = function(screens) {
   this.screens = screens;
-  for (var i = 0, scr = null; scr = this.screens[i]; i++) {
-    window.console.log(scr);
-  }
   chrome.windows.getAll({"populate" : false},
       this.onReceivedWindowsData.bind(this));
 };
@@ -236,8 +233,8 @@ WindowTiler.prototype.tileWindows = function(theWindows, theScreen) {
   window.console.log(theScreen);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
   tileContext = this.computeTiles(tileContext, theWindows.length,
-      theScreen.bounds.left, theScreen.bounds.top,
-      theScreen.bounds.width, theScreen.bounds.height);
+      theScreen.workArea.left, theScreen.workArea.top,
+      theScreen.workArea.width, theScreen.workArea.height);
   for (var i = 0, tile; i < tileContext.length; i++) {
     tile = tileContext[i];
     this.repositionAndResizeWindow(theWindows[i].id, tile.left,
