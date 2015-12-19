@@ -22,6 +22,12 @@ WindowTiler.prototype.screens;
 
 
 /**
+ * Array of windows that currently need repositioning.
+ * @type {Array.<Object>}
+ */
+WindowTiler.prototype.windowsToReposition = [];
+
+/**
  * Starts the whole process of tiling windows.
  * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
  */
@@ -121,6 +127,18 @@ WindowTiler.prototype.filterWindows = function(windowsParam, filters) {
   }
   return filtered;
 }
+
+
+WindowTiler.prototype.processAllWindowRepositioningRequests = function() {
+  if (this.windowsToReposition.length == 0) {
+    this.finished();
+    return;
+  }
+  var tile = this.windowsToReposition.shift();
+  this.repositionAndResizeWindow(tile.windowId,
+      tile.left, tile.top, tile.width, tile.height,
+      this.processAllWindowRepositioningRequests.bind(this));
+};
 
 
 /**
@@ -236,8 +254,9 @@ WindowTiler.prototype.tileWindows = function(theWindows, theScreen) {
       theScreen.workArea.left, theScreen.workArea.top,
       theScreen.workArea.width, theScreen.workArea.height);
   for (var i = 0, tile; i < tileContext.length; i++) {
-    tile = tileContext[i];
-    this.repositionAndResizeWindow(theWindows[i].id, tile.left,
-        tile.top, tile.width, tile.height, (this.finished.bind(this)));
+    var tileContextWithWindowId = tileContext[i];
+    tileContextWithWindowId.windowId = theWindows[i].id;
+    this.windowsToReposition.push(tileContextWithWindowId);
   }
+  this.processAllWindowRepositioningRequests();
 }
