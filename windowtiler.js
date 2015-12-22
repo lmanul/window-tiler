@@ -27,6 +27,14 @@ WindowTiler.prototype.screens;
  */
 WindowTiler.prototype.windowsToReposition = [];
 
+
+/**
+ * Array of windows that currently need verifying.
+ * @type {Array.<Object>}
+ */
+WindowTiler.prototype.windowsToVerify = [];
+
+
 /**
  * Starts the whole process of tiling windows.
  * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
@@ -131,12 +139,13 @@ WindowTiler.prototype.filterWindows = function(windowsParam, filters) {
 
 WindowTiler.prototype.processAllWindowRepositioningRequests = function() {
   if (this.windowsToReposition.length == 0) {
+    //this.verifyAllPositions();
     this.finished();
     return;
   }
   var tile = this.windowsToReposition.shift();
-  this.repositionAndResizeWindow(tile.windowId,
-      tile.left, tile.top, tile.width, tile.height,
+  this.windowsToVerify.push(tile);
+  this.repositionAndResizeWindow(tile,
       this.processAllWindowRepositioningRequests.bind(this));
 };
 
@@ -144,25 +153,42 @@ WindowTiler.prototype.processAllWindowRepositioningRequests = function() {
 /**
  * Utility function to resize a window with the given window ID with the given
  * dimensions, and call the given callback function.
- * @param {number} windowId The ID of the window to resize.
- * @param {number} left The left coordinate to use for the new geometry.
- * @param {number} top The top position to use for the new geometry.
- * @param {number} width The width to use for the new geometry.
- * @param {number} height The height to use for the new geometry.
+ * @param {Object} tile An object containing all the necessary information to
+ *     process the request.
  * @param {Function} callback The callback function to call once the window is
  *     resized.
  */
-WindowTiler.prototype.repositionAndResizeWindow = function(windowId, left, top,
-    width, height, callback) {
-  window.console.log('Repositioning window ' + windowId + ' to ' +
-      width + 'x' + height + ' + (' + left + ', ' + top + ')') ;
-  chrome.windows.update(windowId, {
-    'left': left,
-    'top': top,
-    'width': width,
-    'height': height,
+WindowTiler.prototype.repositionAndResizeWindow = function(tile, callback) {
+  window.console.log('Repositioning window ' + tile.windowId + ' to ' +
+      tile.width + 'x' + tile.height + ' + (' + tile.left + ', ' + tile.top + ')') ;
+  chrome.windows.update(tile.windowId, {
+    'left': tile.left,
+    'top': tile.top,
+    'width': tile.width,
+    'height': tile.height,
     'state': 'normal'
   }, callback);
+};
+
+
+WindowTiler.prototype.verifyAllPositions = function() {
+  var allMatch = true;
+  for (var i = 0, toVerify; toVerify = this.windowsToVerify; i++) {
+    
+  }
+};
+
+
+WindowTiler.prototype.verifynewWindowPosition = function(tile, callback) {
+  chrome.windows.get(tile.windowId, undefined, function(theWindow) {
+    var comparison = WindowTilerUtils.compareAreas(tile, theWindow);
+    if (comparison == 0) {
+      console.log('Equal:', tile, ' and ', theWindow);
+    } else {
+      console.log('NOT Equal:', tile, ' and ', theWindow);
+    }
+    callback();
+  });
 };
 
 
