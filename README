@@ -1,1 +1,5 @@
-Feedback and patches welcome! http://github.com/lmanul/window-tiler
+Automatically tile windows - Chrome browser Extension.
+
+Tiling pattern can be specified in config file.
+
+Fork of https://github.com/lmanul/window-tiler
