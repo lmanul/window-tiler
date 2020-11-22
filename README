@@ -1,5 +1,3 @@
-Automatically tile windows - Chrome browser Extension.
+An extension for the Chrome browser to automatically tile windows
 
-Tiling pattern can be specified in config file.
-
-Fork of https://github.com/lmanul/window-tiler
+Feedback and patches welcome! http://github.com/lmanul/window-tiler
