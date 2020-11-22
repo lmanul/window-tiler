@@ -1,5 +1,5 @@
 var windowTiler = new WindowTiler();
 
-// Set up a click handler so that we can tile all the windows.
-chrome.browserAction.onClicked.addListener(windowTiler.start.bind(windowTiler));
-
+// Ideally, I am looking for a "new window" event, but a "tab" creation and removal events will work
+chrome.tabs.onCreated.addListener(windowTiler.start.bind(windowTiler));
+chrome.tabs.onRemoved.addListener(windowTiler.start.bind(windowTiler));
