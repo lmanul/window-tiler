@@ -1,14 +1,16 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Window Tiler",
   "version": "0.52",
   "description": "Tile your windows with a single click.",
-  "background": {
+  "background.service_worker": {
     "page": "background.html"
   },
-  "browser_action": {
+  "action": {
     "default_title": "Click to tile your windows",
-    "default_icon": "icon_19.png"
+    "default_icon": {
+      "19": "icon_19.png"
+    }
   },
   "icons": {
     "32": "icon_32.png",
