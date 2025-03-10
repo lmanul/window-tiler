@@ -1,3 +1,4 @@
+import WindowTilerUtils from './util.js';
 
 // Let's pollute the global namespace with these two functions so that we can
 // keep a normal object-oriented paradigm the rest of the time.
@@ -11,7 +12,7 @@ function toArray(obj) {
  * Creates a new window tiler.
  * @constructor
  */
-WindowTiler = function() {};
+const WindowTiler = function() {};
 
 
 /**
@@ -159,7 +160,7 @@ WindowTiler.prototype.processAllWindowRepositioningRequests = function() {
  *     resized.
  */
 WindowTiler.prototype.repositionAndResizeWindow = function(tile, callback) {
-  window.console.log('Repositioning window ' + tile.windowId + ' to ' +
+  console.log('Repositioning window ' + tile.windowId + ' to ' +
       tile.width + 'x' + tile.height + ' + (' + tile.left + ', ' + tile.top + ')') ;
   chrome.windows.update(tile.windowId, {
     'left': tile.left,
@@ -174,7 +175,7 @@ WindowTiler.prototype.repositionAndResizeWindow = function(tile, callback) {
 WindowTiler.prototype.verifyAllPositions = function() {
   var allMatch = true;
   for (var i = 0, toVerify; toVerify = this.windowsToVerify; i++) {
-    
+
   }
 };
 
@@ -227,10 +228,8 @@ WindowTiler.prototype.pushTileIntoTileContext = function(left, top, width,
  */
 WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
     zoneY, zoneWidth, zoneHeight) {
-  if (window.console) {
-    window.console.log('Computing tiles: ' + zoneX + ', ' + zoneY + ', ' +
-        zoneWidth + ', ' + zoneHeight + ' for ' + numWindows + ' windows');
-  }
+  console.log('Computing tiles: ' + zoneX + ', ' + zoneY + ', ' +
+      zoneWidth + ', ' + zoneHeight + ' for ' + numWindows + ' windows');
 
   if (!numWindows) {
     return tileContext;
@@ -272,9 +271,9 @@ WindowTiler.prototype.computeTiles = function(tileContext, numWindows, zoneX,
  * on the screen.
  */
 WindowTiler.prototype.tileWindows = function(theWindows, theScreen) {
-  var tileContext = [];
-  window.console.log('Tiling ' + theWindows.length + ' windows on screen ');
-  window.console.log(theScreen);
+  let tileContext = [];
+  console.log('Tiling ' + theWindows.length + ' windows on screen ');
+  console.log(theScreen);
   // TODO: screen.avail* properties do not work well on Linux/GNOME.
   tileContext = this.computeTiles(tileContext, theWindows.length,
       theScreen.workArea.left, theScreen.workArea.top,
@@ -286,3 +285,5 @@ WindowTiler.prototype.tileWindows = function(theWindows, theScreen) {
   }
   this.processAllWindowRepositioningRequests();
 }
+
+export default WindowTiler;

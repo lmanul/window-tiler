@@ -1,4 +1,4 @@
-WindowTilerUtils = function() {};
+const WindowTilerUtils = function() {};
 
 /**
  * Utility function to compare 2-dimensionnal areas.
@@ -31,3 +31,4 @@ WindowTilerUtils.rectangleOverlap = function(topA, leftA, widthA, heightA,
   return xOverlap * yOverlap;
 };
 
+export default WindowTilerUtils;

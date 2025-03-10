@@ -3,8 +3,9 @@
   "name": "Window Tiler",
   "version": "0.53",
   "description": "Tile your windows with a single click.",
-  "background.service_worker": {
-    "page": "background.html"
+  "background": {
+    "service_worker": "service_worker.js",
+    "type": "module"
   },
   "action": {
     "default_title": "Click to tile your windows",
