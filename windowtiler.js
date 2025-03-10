@@ -140,7 +140,7 @@ WindowTiler.prototype.filterWindows = function(windowsParam, filters) {
 
 WindowTiler.prototype.processAllWindowRepositioningRequests = function() {
   if (this.windowsToReposition.length == 0) {
-    //this.verifyAllPositions();
+    // this.verifyAllPositions();
     this.finished();
     return;
   }
@@ -174,21 +174,23 @@ WindowTiler.prototype.repositionAndResizeWindow = function(tile, callback) {
 
 WindowTiler.prototype.verifyAllPositions = function() {
   var allMatch = true;
-  for (var i = 0, toVerify; toVerify = this.windowsToVerify; i++) {
-
+  for (let toVerify of this.windowsToVerify) {
+    this.verifynewWindowPosition(toVerify);
   }
 };
 
 
 WindowTiler.prototype.verifynewWindowPosition = function(tile, callback) {
   chrome.windows.get(tile.windowId, undefined, function(theWindow) {
-    var comparison = WindowTilerUtils.compareAreas(tile, theWindow);
+    const comparison = WindowTilerUtils.compareAreas(tile, theWindow);
     if (comparison == 0) {
       console.log('Equal:', tile, ' and ', theWindow);
     } else {
       console.log('NOT Equal:', tile, ' and ', theWindow);
     }
-    callback();
+    if (callback) {
+      callback();
+    }
   });
 };
 
