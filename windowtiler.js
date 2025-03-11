@@ -9,7 +9,6 @@ function toArray(obj) {
 
 class WindowTiler {
   constructor() {
-
     /**
      * Array of windows that currently need repositioning.
      * @type {Array.<Object>}
@@ -197,12 +196,7 @@ class WindowTiler {
    * @param {Array.<Object>} tileContext The context to which to add the new tile.
    */
   pushTileIntoTileContext = (left, top, width, height, tileContext) => {
-    tileContext.push({
-      left: left,
-      top: top,
-      width: width,
-      height: height,
-    });
+    tileContext.push({ left, top, width, height });
     return tileContext;
   };
 
@@ -303,7 +297,7 @@ class WindowTiler {
    */
   tileWindows = (theWindows, theScreen) => {
     let tileContext = [];
-    console.log('Tiling ' + theWindows.length + ' windows on screen ');
+    console.log("Tiling " + theWindows.length + " windows on screen ");
     console.log(theScreen);
     // TODO: screen.avail* properties do not work well on Linux/GNOME.
     tileContext = this.computeTiles(
