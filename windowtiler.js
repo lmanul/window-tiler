@@ -32,11 +32,11 @@ class WindowTiler {
    * Starts the whole process of tiling windows.
    * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
    */
-  start = function (tab) {
+  start = (tab) => {
     chrome.system.display.getInfo(this.onReceivedDisplayData.bind(this));
   };
 
-  onReceivedDisplayData = function (screens) {
+  onReceivedDisplayData = (screens) => {
     this.screens = screens;
     chrome.windows.getAll(
       { populate: false },
@@ -44,7 +44,7 @@ class WindowTiler {
     );
   };
 
-  findWindowsOnThisScreen = function (theWindows, theScreen, allScreens) {
+  findWindowsOnThisScreen = (theWindows, theScreen, allScreens) => {
     var windowsOnSelectedScreen = [];
 
     for (var eachWindow, i = 0; (eachWindow = theWindows[i]); i++) {
@@ -77,7 +77,7 @@ class WindowTiler {
    * Callback for when we received data about the currently open windows.
    * @param {Array.<chrome.windows.Window>} windows The array of open windows.
    */
-  onReceivedWindowsData = function (windowsParam) {
+  onReceivedWindowsData = (windowsParam) => {
     var filters = [];
     filters.push(this.windowIsNonMinimized);
     var filteredWindows = this.filterWindows(windowsParam, filters);
@@ -111,15 +111,15 @@ class WindowTiler {
    * @param {chrome.windows.Window} myWindow The window that has just finished
    * resizing.
    */
-  finished = function (myWindow) {
+  finished = (myWindow) => {
     // Do nothing for now.
   };
 
-  windowIsNonMinimized = function (theWindow) {
+  windowIsNonMinimized = (theWindow) => {
     return theWindow.state != "minimized";
   };
 
-  filterWindows = function (windowsParam, filters) {
+  filterWindows = (windowsParam, filters) => {
     var filtered = [];
     for (var i = 0; i < windowsParam.length; i++) {
       var shouldAdd = true;
@@ -133,7 +133,7 @@ class WindowTiler {
     return filtered;
   };
 
-  processAllWindowRepositioningRequests = function () {
+  processAllWindowRepositioningRequests = () => {
     if (this.windowsToReposition.length == 0) {
       // this.verifyAllPositions();
       this.finished();
@@ -155,7 +155,7 @@ class WindowTiler {
    * @param {Function} callback The callback function to call once the window is
    *     resized.
    */
-  repositionAndResizeWindow = function (tile, callback) {
+  repositionAndResizeWindow = (tile, callback) => {
     console.log(
       "Repositioning window " +
         tile.windowId +
@@ -182,14 +182,14 @@ class WindowTiler {
     );
   };
 
-  verifyAllPositions = function () {
+  verifyAllPositions = () => {
     var allMatch = true;
     for (let toVerify of this.windowsToVerify) {
       this.verifynewWindowPosition(toVerify);
     }
   };
 
-  verifynewWindowPosition = function (tile, callback) {
+  verifynewWindowPosition = (tile, callback) => {
     chrome.windows.get(tile.windowId, undefined, function (theWindow) {
       const comparison = WindowTilerUtils.compareAreas(tile, theWindow);
       if (comparison == 0) {
@@ -212,7 +212,7 @@ class WindowTiler {
    * @param {number} height The height to use for the added tile.
    * @param {Array.<Object>} tileContext The context to which to add the new tile.
    */
-  pushTileIntoTileContext = function (left, top, width, height, tileContext) {
+  pushTileIntoTileContext = (left, top, width, height, tileContext) => {
     tileContext.push({
       left: left,
       top: top,
@@ -234,14 +234,14 @@ class WindowTiler {
    * @param {number} zoneWidth The width of the zone remaining to tile.
    * @param {number} zoneHeight The height of the zone remaining to tile.
    */
-  computeTiles = function (
+  computeTiles = (
     tileContext,
     numWindows,
     zoneX,
     zoneY,
     zoneWidth,
     zoneHeight
-  ) {
+  ) => {
     console.log(
       "Computing tiles: " +
         zoneX +
@@ -317,7 +317,7 @@ class WindowTiler {
    * Tiles the windows given in an array as an argument over the available area
    * on the screen.
    */
-  tileWindows = function (theWindows, theScreen) {
+  tileWindows = (theWindows, theScreen) => {
     let tileContext = [];
     console.log("Tiling " + theWindows.length + " windows on screen ");
     console.log(theScreen);
