@@ -2,7 +2,6 @@ import WindowTilerUtils from "./util.js";
 
 class WindowTiler {
   constructor() {
-
     /**
      * Array of windows that currently need verifying.
      * @type {Array.<Object>}
@@ -137,16 +136,13 @@ class WindowTiler {
       `Repositioning window ${tile.windowId} `,
       `to ${tile.width}x${tile.height} (${tile.left}, ${tile.top})`
     );
-    await chrome.windows.update(
-      tile.windowId,
-      {
-        left: tile.left,
-        top: tile.top,
-        width: tile.width,
-        height: tile.height,
-        state: "normal",
-      },
-    );
+    await chrome.windows.update(tile.windowId, {
+      left: tile.left,
+      top: tile.top,
+      width: tile.width,
+      height: tile.height,
+      state: "normal",
+    });
   };
 
   verifyAllPositions = () => {
@@ -201,17 +197,7 @@ class WindowTiler {
     zoneHeight
   ) => {
     console.log(
-      "Computing tiles: " +
-        zoneX +
-        ", " +
-        zoneY +
-        ", " +
-        zoneWidth +
-        ", " +
-        zoneHeight +
-        " for " +
-        numWindows +
-        " windows"
+      `Computing tiles: ${zoneX}, ${zoneY}, ${zoneWidth}, ${zoneHeight} for ${numWindows} windows`
     );
 
     if (!numWindows) {
