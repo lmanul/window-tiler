@@ -156,17 +156,8 @@ class WindowTiler {
    */
   repositionAndResizeWindow = (tile, callback) => {
     console.log(
-      "Repositioning window " +
-        tile.windowId +
-        " to " +
-        tile.width +
-        "x" +
-        tile.height +
-        " + (" +
-        tile.left +
-        ", " +
-        tile.top +
-        ")"
+      `Repositioning window ${tile.windowId} `,
+      `to ${tile.width}x${tile.height} (${tile.left}, ${tile.top})`
     );
     chrome.windows.update(
       tile.windowId,
@@ -318,7 +309,7 @@ class WindowTiler {
    */
   tileWindows = (theWindows, theScreen) => {
     let tileContext = [];
-    console.log("Tiling " + theWindows.length + " windows on screen ");
+    console.log('Tiling ' + theWindows.length + ' windows on screen ');
     console.log(theScreen);
     // TODO: screen.avail* properties do not work well on Linux/GNOME.
     tileContext = this.computeTiles(
@@ -329,7 +320,7 @@ class WindowTiler {
       theScreen.workArea.width,
       theScreen.workArea.height
     );
-    for (var i = 0, tile; i < tileContext.length; i++) {
+    for (let i = 0, tile; i < tileContext.length; i++) {
       var tileContextWithWindowId = tileContext[i];
       tileContextWithWindowId.windowId = theWindows[i].id;
       this.windowsToReposition.push(tileContextWithWindowId);
