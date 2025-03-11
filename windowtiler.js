@@ -32,16 +32,15 @@ class WindowTiler {
    * Starts the whole process of tiling windows.
    * @param {chrome.windows.Tab} tab The tab from which the action was triggered.
    */
-  start = (tab) => {
-    chrome.system.display.getInfo(this.onReceivedDisplayData.bind(this));
+  start = async (tab) => {
+    const screens = await chrome.system.display.getInfo();
+    this.onReceivedDisplayData(screens);
   };
 
-  onReceivedDisplayData = (screens) => {
+  onReceivedDisplayData = async (screens) => {
     this.screens = screens;
-    chrome.windows.getAll(
-      { populate: false },
-      this.onReceivedWindowsData.bind(this)
-    );
+    const windowsInfo = await chrome.windows.getAll({ populate: false });
+    this.onReceivedWindowsData(windowsInfo);
   };
 
   findWindowsOnThisScreen = (theWindows, theScreen, allScreens) => {
