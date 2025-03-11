@@ -1,12 +1,5 @@
 import WindowTilerUtils from "./util.js";
 
-// Let's pollute the global namespace with these two functions so that we can
-// keep a normal object-oriented paradigm the rest of the time.
-
-function toArray(obj) {
-  return Array.prototype.slice.call(obj);
-}
-
 class WindowTiler {
   constructor() {
     /**
@@ -168,22 +161,18 @@ class WindowTiler {
   verifyAllPositions = () => {
     var allMatch = true;
     for (let toVerify of this.windowsToVerify) {
-      this.verifynewWindowPosition(toVerify);
+      this.verifyNewWindowPosition(toVerify);
     }
   };
 
-  verifynewWindowPosition = (tile, callback) => {
-    chrome.windows.get(tile.windowId, undefined, function (theWindow) {
-      const comparison = WindowTilerUtils.compareAreas(tile, theWindow);
-      if (comparison == 0) {
-        console.log("Equal:", tile, " and ", theWindow);
-      } else {
-        console.log("NOT Equal:", tile, " and ", theWindow);
-      }
-      if (callback) {
-        callback();
-      }
-    });
+  verifyNewWindowPosition = async (tile) => {
+    const theWindow = await chrome.windows.get(tile.windowId);
+    const comparison = WindowTilerUtils.compareAreas(tile, theWindow);
+    if (comparison == 0) {
+      console.log("Equal:", tile, " and ", theWindow);
+    } else {
+      console.log("NOT Equal:", tile, " and ", theWindow);
+    }
   };
 
   /**
@@ -250,9 +239,9 @@ class WindowTiler {
       return tileContext;
     }
 
-    var halfNumWindows = Math.floor(numWindows / 2);
+    const halfNumWindows = Math.floor(numWindows / 2);
     if (zoneWidth > zoneHeight) {
-      var halfWidth = Math.floor(zoneWidth / 2);
+      const halfWidth = Math.floor(zoneWidth / 2);
       tileContext = this.computeTiles(
         tileContext,
         halfNumWindows,
@@ -270,7 +259,7 @@ class WindowTiler {
         zoneHeight
       );
     } else {
-      var halfHeight = Math.floor(zoneHeight / 2);
+      const halfHeight = Math.floor(zoneHeight / 2);
       tileContext = this.computeTiles(
         tileContext,
         halfNumWindows,
@@ -308,8 +297,8 @@ class WindowTiler {
       theScreen.workArea.width,
       theScreen.workArea.height
     );
-    for (let i = 0, tile; i < tileContext.length; i++) {
-      var tileContextWithWindowId = tileContext[i];
+    for (let i = 0; i < tileContext.length; i++) {
+      const tileContextWithWindowId = tileContext[i];
       tileContextWithWindowId.windowId = theWindows[i].id;
       this.windowsToReposition.push(tileContextWithWindowId);
     }
