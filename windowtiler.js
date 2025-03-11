@@ -9,11 +9,6 @@ function toArray(obj) {
 
 class WindowTiler {
   constructor() {
-    /**
-     * Array of all the screens for this instance of Chrome.
-     * @type {Array.<Object>}
-     */
-    this.screens = [];
 
     /**
      * Array of windows that currently need repositioning.
@@ -38,9 +33,8 @@ class WindowTiler {
   };
 
   onReceivedDisplayData = async (screens) => {
-    this.screens = screens;
     const windowsInfo = await chrome.windows.getAll({ populate: false });
-    this.onReceivedWindowsData(windowsInfo);
+    this.onReceivedWindowsData(windowsInfo, screens);
   };
 
   findWindowsOnThisScreen = (theWindows, theScreen, allScreens) => {
@@ -76,13 +70,13 @@ class WindowTiler {
    * Callback for when we received data about the currently open windows.
    * @param {Array.<chrome.windows.Window>} windows The array of open windows.
    */
-  onReceivedWindowsData = (windowsParam) => {
+  onReceivedWindowsData = (windowsParam, screens) => {
     const filters = [];
     filters.push(this.windowIsNonMinimized);
     const filteredWindows = this.filterWindows(windowsParam, filters);
 
     var mainScreen;
-    for (var i = 0, eachScreen; (eachScreen = this.screens[i]); i++) {
+    for (var i = 0, eachScreen; (eachScreen = screens[i]); i++) {
       if (eachScreen.isPrimary) {
         mainScreen = eachScreen;
         break;
@@ -94,11 +88,11 @@ class WindowTiler {
       return;
     }
 
-    for (var i = 0, eachScreen; (eachScreen = this.screens[i]); i++) {
+    for (var i = 0, eachScreen; (eachScreen = screens[i]); i++) {
       const windowsForThisScreen = this.findWindowsOnThisScreen(
         filteredWindows,
         eachScreen,
-        this.screens
+        screens
       );
 
       this.tileWindows(windowsForThisScreen, eachScreen);
