@@ -44,13 +44,13 @@ class WindowTiler {
   };
 
   findWindowsOnThisScreen = (theWindows, theScreen, allScreens) => {
-    var windowsOnSelectedScreen = [];
+    const windowsOnSelectedScreen = [];
 
     for (var eachWindow, i = 0; (eachWindow = theWindows[i]); i++) {
-      var maxOverlap = 0;
-      var screenWithMaxOverlap;
-      for (var eachScreen, j = 0; (eachScreen = allScreens[j]); j++) {
-        var overlap = WindowTilerUtils.rectangleOverlap(
+      let maxOverlap = 0;
+      let screenWithMaxOverlap;
+      for (let eachScreen of allScreens) {
+        let overlap = WindowTilerUtils.rectangleOverlap(
           eachWindow.top,
           eachWindow.left,
           eachWindow.width,
@@ -77,9 +77,9 @@ class WindowTiler {
    * @param {Array.<chrome.windows.Window>} windows The array of open windows.
    */
   onReceivedWindowsData = (windowsParam) => {
-    var filters = [];
+    const filters = [];
     filters.push(this.windowIsNonMinimized);
-    var filteredWindows = this.filterWindows(windowsParam, filters);
+    const filteredWindows = this.filterWindows(windowsParam, filters);
 
     var mainScreen;
     for (var i = 0, eachScreen; (eachScreen = this.screens[i]); i++) {
@@ -95,7 +95,7 @@ class WindowTiler {
     }
 
     for (var i = 0, eachScreen; (eachScreen = this.screens[i]); i++) {
-      var windowsForThisScreen = this.findWindowsOnThisScreen(
+      const windowsForThisScreen = this.findWindowsOnThisScreen(
         filteredWindows,
         eachScreen,
         this.screens
@@ -119,10 +119,10 @@ class WindowTiler {
   };
 
   filterWindows = (windowsParam, filters) => {
-    var filtered = [];
+    const filtered = [];
     for (var i = 0; i < windowsParam.length; i++) {
-      var shouldAdd = true;
-      for (var j = 0; j < filters.length; j++) {
+      let shouldAdd = true;
+      for (let j = 0; j < filters.length; j++) {
         shouldAdd &= filters[j](windowsParam[i]);
       }
       if (shouldAdd) {
@@ -138,7 +138,7 @@ class WindowTiler {
       this.finished();
       return;
     }
-    var tile = this.windowsToReposition.shift();
+    const tile = this.windowsToReposition.shift();
     this.windowsToVerify.push(tile);
     this.repositionAndResizeWindow(
       tile,
