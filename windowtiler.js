@@ -2,11 +2,6 @@ import WindowTilerUtils from "./util.js";
 
 class WindowTiler {
   constructor() {
-    /**
-     * Array of windows that currently need repositioning.
-     * @type {Array.<Object>}
-     */
-    this.windowsToReposition = [];
 
     /**
      * Array of windows that currently need verifying.
@@ -118,18 +113,17 @@ class WindowTiler {
     return filtered;
   };
 
-  processAllWindowRepositioningRequests = () => {
-    if (this.windowsToReposition.length == 0) {
+  processAllWindowRepositioningRequests = async (windowsToReposition) => {
+    if (windowsToReposition.length == 0) {
       // this.verifyAllPositions();
       this.finished();
       return;
     }
-    const tile = this.windowsToReposition.shift();
-    this.windowsToVerify.push(tile);
-    this.repositionAndResizeWindow(
-      tile,
-      this.processAllWindowRepositioningRequests.bind(this)
-    );
+    while (windowsToReposition.length > 0) {
+      const tile = windowsToReposition.shift();
+      this.windowsToVerify.push(tile);
+      await this.repositionAndResizeWindow(tile);
+    }
   };
 
   /**
@@ -137,15 +131,13 @@ class WindowTiler {
    * dimensions, and call the given callback function.
    * @param {Object} tile An object containing all the necessary information to
    *     process the request.
-   * @param {Function} callback The callback function to call once the window is
-   *     resized.
    */
-  repositionAndResizeWindow = (tile, callback) => {
+  repositionAndResizeWindow = async (tile) => {
     console.log(
       `Repositioning window ${tile.windowId} `,
       `to ${tile.width}x${tile.height} (${tile.left}, ${tile.top})`
     );
-    chrome.windows.update(
+    await chrome.windows.update(
       tile.windowId,
       {
         left: tile.left,
@@ -154,7 +146,6 @@ class WindowTiler {
         height: tile.height,
         state: "normal",
       },
-      callback
     );
   };
 
@@ -286,6 +277,7 @@ class WindowTiler {
    */
   tileWindows = (theWindows, theScreen) => {
     let tileContext = [];
+    const windowsToReposition = [];
     console.log("Tiling " + theWindows.length + " windows on screen ");
     console.log(theScreen);
     // TODO: screen.avail* properties do not work well on Linux/GNOME.
@@ -300,9 +292,9 @@ class WindowTiler {
     for (let i = 0; i < tileContext.length; i++) {
       const tileContextWithWindowId = tileContext[i];
       tileContextWithWindowId.windowId = theWindows[i].id;
-      this.windowsToReposition.push(tileContextWithWindowId);
+      windowsToReposition.push(tileContextWithWindowId);
     }
-    this.processAllWindowRepositioningRequests();
+    this.processAllWindowRepositioningRequests(windowsToReposition);
   };
 }
 
