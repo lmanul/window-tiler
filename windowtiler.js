@@ -1,3 +1,4 @@
+import Rect from './rect.js';
 import WindowTilerUtils from "./util.js";
 
 class WindowTiler {
@@ -31,14 +32,8 @@ class WindowTiler {
       let screenWithMaxOverlap;
       for (let eachScreen of allScreens) {
         let overlap = WindowTilerUtils.rectangleOverlap(
-          eachWindow.top,
-          eachWindow.left,
-          eachWindow.width,
-          eachWindow.height,
-          eachScreen.bounds.top,
-          eachScreen.bounds.left,
-          eachScreen.bounds.width,
-          eachScreen.bounds.height
+          new Rect(eachWindow.top, eachWindow.left, eachWindow.width, eachWindow.height),
+          new Rect(eachScreen.bounds.top, eachScreen.bounds.left, eachScreen.bounds.width, eachScreen.bounds.height)
         );
         if (overlap >= maxOverlap) {
           maxOverlap = overlap;
@@ -114,7 +109,7 @@ class WindowTiler {
 
   processAllWindowRepositioningRequests = async (windowsToReposition) => {
     if (windowsToReposition.length == 0) {
-      // this.verifyAllPositions();
+      await this.verifyAllPositions();
       this.finished();
       return;
     }
@@ -145,10 +140,10 @@ class WindowTiler {
     });
   };
 
-  verifyAllPositions = () => {
+  verifyAllPositions = async () => {
     var allMatch = true;
     for (let toVerify of this.windowsToVerify) {
-      this.verifyNewWindowPosition(toVerify);
+      await this.verifyNewWindowPosition(toVerify);
     }
   };
 
@@ -264,8 +259,11 @@ class WindowTiler {
   tileWindows = (theWindows, theScreen) => {
     let tileContext = [];
     const windowsToReposition = [];
-    console.log("Tiling " + theWindows.length + " windows on screen ");
-    console.log(theScreen);
+    if (theWindows.length === 0) {
+      console.log('No windows on screen', theScreen);
+      return;
+    }
+    console.log('Tiling ' + theWindows.length + ' windows on screen', theScreen);
     // TODO: screen.avail* properties do not work well on Linux/GNOME.
     tileContext = this.computeTiles(
       tileContext,

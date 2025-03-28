@@ -22,12 +22,11 @@ WindowTilerUtils.compareAreas = function(a, b) {
 };
 
 
-WindowTilerUtils.rectangleOverlap = function(topA, leftA, widthA, heightA,
-    topB, leftB, widthB, heightB) {
+WindowTilerUtils.rectangleOverlap = function(rectA, rectB) {
   var xOverlap = Math.max(
-    Math.min(leftA + widthA, leftB + widthB) - Math.max(leftA, leftB), 0);
+    Math.min(rectA.x + rectA.width, rectB.x + rectB.width) - Math.max(rectA.x, rectB.x), 0);
   var yOverlap = Math.max(
-    Math.min(topA + heightA, topB + heightB) - Math.max(topA, topB), 0);
+    Math.min(rectA.y + rectA.height, rectB.y + rectB.height) - Math.max(rectA.y, rectB.y), 0);
   return xOverlap * yOverlap;
 };
 
