@@ -1,4 +1,4 @@
-import Rect from './rect.js';
+import Rect from "./rect.js";
 import WindowTilerUtils from "./util.js";
 
 class WindowTiler {
@@ -32,8 +32,18 @@ class WindowTiler {
       let screenWithMaxOverlap;
       for (let eachScreen of allScreens) {
         let overlap = WindowTilerUtils.rectangleOverlap(
-          new Rect(eachWindow.top, eachWindow.left, eachWindow.width, eachWindow.height),
-          new Rect(eachScreen.bounds.top, eachScreen.bounds.left, eachScreen.bounds.width, eachScreen.bounds.height)
+          new Rect(
+            eachWindow.top,
+            eachWindow.left,
+            eachWindow.width,
+            eachWindow.height
+          ),
+          new Rect(
+            eachScreen.bounds.top,
+            eachScreen.bounds.left,
+            eachScreen.bounds.width,
+            eachScreen.bounds.height
+          )
         );
         if (overlap >= maxOverlap) {
           maxOverlap = overlap;
@@ -167,7 +177,9 @@ class WindowTiler {
    * @param {Rect} zoneRect The rectangle of the zone remaining to tile.
    */
   computeTiles = (tileContext, numWindows, zoneRect) => {
-    console.log(`Computing tiles: ${zoneRect.toString()} for ${numWindows} windows`);
+    console.log(
+      `Computing tiles: ${zoneRect.toString()} for ${numWindows} windows`
+    );
 
     if (!numWindows) {
       return tileContext;
@@ -175,7 +187,7 @@ class WindowTiler {
 
     // Base case: only one window remains, we occupy the whole remaining space.
     if (numWindows == 1) {
-      tileContext.push(zoneRect)
+      tileContext.push(zoneRect);
       return tileContext;
     }
 
@@ -190,7 +202,12 @@ class WindowTiler {
       tileContext = this.computeTiles(
         tileContext,
         numWindows - halfNumWindows,
-        new Rect(zoneRect.x + halfWidth + 1, zoneRect.y, zoneRect.width - halfWidth, zoneRect.height)
+        new Rect(
+          zoneRect.x + halfWidth + 1,
+          zoneRect.y,
+          zoneRect.width - halfWidth,
+          zoneRect.height
+        )
       );
     } else {
       const halfHeight = Math.floor(zoneRect.height / 2);
@@ -202,7 +219,12 @@ class WindowTiler {
       tileContext = this.computeTiles(
         tileContext,
         numWindows - halfNumWindows,
-        new Rect(zoneRect.x, zoneRect.y + halfHeight + 1, zoneRect.width, zoneRect.height - halfHeight)
+        new Rect(
+          zoneRect.x,
+          zoneRect.y + halfHeight + 1,
+          zoneRect.width,
+          zoneRect.height - halfHeight
+        )
       );
     }
     return tileContext;
@@ -216,15 +238,23 @@ class WindowTiler {
     let tileContext = [];
     const windowsToReposition = [];
     if (theWindows.length === 0) {
-      console.log('No windows on screen', theScreen);
+      console.log("No windows on screen", theScreen);
       return;
     }
-    console.log('Tiling ' + theWindows.length + ' windows on screen', theScreen);
+    console.log(
+      "Tiling " + theWindows.length + " windows on screen",
+      theScreen
+    );
     // TODO: screen.avail* properties do not work well on Linux/GNOME.
     tileContext = this.computeTiles(
       tileContext,
       theWindows.length,
-      new Rect(theScreen.workArea.left, theScreen.workArea.top, theScreen.workArea.width, theScreen.workArea.height)
+      new Rect(
+        theScreen.workArea.left,
+        theScreen.workArea.top,
+        theScreen.workArea.width,
+        theScreen.workArea.height
+      )
     );
     for (let i = 0; i < tileContext.length; i++) {
       const tileContextWithWindowId = tileContext[i];
