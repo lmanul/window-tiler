@@ -12,11 +12,11 @@ WindowTilerUtils.compareAreas = function(a, b) {
   if (a.height != b.height) {
     return a.height - b.height;
   }
-  if (a.left != b.left) {
-    return a.left - b.left;
+  if (a.x != b.x) {
+    return a.x - b.x;
   }
-  if (a.top != b.top) {
-    return a.top - b.top;
+  if (a.y != b.y) {
+    return a.y - b.y;
   }
   return 0;
 };

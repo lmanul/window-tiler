@@ -119,8 +119,6 @@ class WindowTiler {
 
   processAllWindowRepositioningRequests = async (windowsToReposition) => {
     if (windowsToReposition.length == 0) {
-      await this.verifyAllPositions();
-      this.finished();
       return;
     }
     while (windowsToReposition.length > 0) {
@@ -128,7 +126,9 @@ class WindowTiler {
       this.windowsToVerify.push(tile);
       await this.repositionAndResizeWindow(tile);
     }
-  };
+    await this.verifyAllPositions();
+    this.finished();
+};
 
   /**
    * Utility function to resize a window with the given window ID with the given
@@ -157,13 +157,14 @@ class WindowTiler {
     }
   };
 
-  verifyNewWindowPosition = async (tile) => {
-    const theWindow = await chrome.windows.get(tile.windowId);
-    const comparison = WindowTilerUtils.compareAreas(tile, theWindow);
+  verifyNewWindowPosition = async (expectedTile) => {
+    const theWindow = await chrome.windows.get(expectedTile.windowId);
+    const actualTile = new Rect(theWindow.left, theWindow.top, theWindow.width, theWindow.height);
+    const comparison = WindowTilerUtils.compareAreas(expectedTile, actualTile);
     if (comparison == 0) {
-      console.log("Equal:", tile, " and ", theWindow);
+      console.log("Equal:", expectedTile, " and ", actualTile);
     } else {
-      console.log("NOT Equal:", tile, " and ", theWindow);
+      console.log("NOT Equal:", expectedTile, " and ", actualTile);
     }
   };
 
@@ -245,6 +246,7 @@ class WindowTiler {
       "Tiling " + theWindows.length + " windows on screen",
       theScreen
     );
+    console.log('Initial: ', theWindows);
     // TODO: screen.avail* properties do not work well on Linux/GNOME.
     tileContext = this.computeTiles(
       tileContext,
