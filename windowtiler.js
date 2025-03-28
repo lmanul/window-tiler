@@ -129,11 +129,11 @@ class WindowTiler {
   repositionAndResizeWindow = async (tile) => {
     console.log(
       `Repositioning window ${tile.windowId} `,
-      `to ${tile.width}x${tile.height} (${tile.left}, ${tile.top})`
+      `to ${tile.width}x${tile.height} (${tile.x}, ${tile.y})`
     );
     await chrome.windows.update(tile.windowId, {
-      left: tile.left,
-      top: tile.top,
+      left: tile.x,
+      top: tile.y,
       width: tile.width,
       height: tile.height,
       state: "normal",
@@ -158,42 +158,16 @@ class WindowTiler {
   };
 
   /**
-   * Adds a tile (which contains information about one of the tiles on the screen)
-   * into the current context (array of computed tiles).
-   * @param {number} left The left position to use for the added tile.
-   * @param {number} top The top position to use for the added tile.
-   * @param {number} width The width to use for the added tile.
-   * @param {number} height The height to use for the added tile.
-   * @param {Array.<Object>} tileContext The context to which to add the new tile.
-   */
-  pushTileIntoTileContext = (left, top, width, height, tileContext) => {
-    tileContext.push({ left, top, width, height });
-    return tileContext;
-  };
-
-  /**
    * Computes the relevant tiles and pushes them into the given tile context, for
    * a zone on the screen defined by the arguments, and for the given number of
    * windows to tile.
    * @param {Array.<Object>} tileContext The tile context to which to add computed
    *     tiles.
    * @param {number} numWindows The number of windows left to tile.
-   * @param {number} zoneX The X coordinate of the zone remaining to tile.
-   * @param {number} zoneY The Y coordinate of the zone remaining to tile.
-   * @param {number} zoneWidth The width of the zone remaining to tile.
-   * @param {number} zoneHeight The height of the zone remaining to tile.
+   * @param {Rect} zoneRect The rectangle of the zone remaining to tile.
    */
-  computeTiles = (
-    tileContext,
-    numWindows,
-    zoneX,
-    zoneY,
-    zoneWidth,
-    zoneHeight
-  ) => {
-    console.log(
-      `Computing tiles: ${zoneX}, ${zoneY}, ${zoneWidth}, ${zoneHeight} for ${numWindows} windows`
-    );
+  computeTiles = (tileContext, numWindows, zoneRect) => {
+    console.log(`Computing tiles: ${zoneRect.toString()} for ${numWindows} windows`);
 
     if (!numWindows) {
       return tileContext;
@@ -201,52 +175,34 @@ class WindowTiler {
 
     // Base case: only one window remains, we occupy the whole remaining space.
     if (numWindows == 1) {
-      this.pushTileIntoTileContext(
-        zoneX,
-        zoneY,
-        zoneWidth,
-        zoneHeight,
-        tileContext
-      );
+      tileContext.push(zoneRect)
       return tileContext;
     }
 
     const halfNumWindows = Math.floor(numWindows / 2);
-    if (zoneWidth > zoneHeight) {
-      const halfWidth = Math.floor(zoneWidth / 2);
+    if (zoneRect.width > zoneRect.height) {
+      const halfWidth = Math.floor(zoneRect.width / 2);
       tileContext = this.computeTiles(
         tileContext,
         halfNumWindows,
-        zoneX,
-        zoneY,
-        halfWidth,
-        zoneHeight
+        new Rect(zoneRect.x, zoneRect.y, halfWidth, zoneRect.height)
       );
       tileContext = this.computeTiles(
         tileContext,
         numWindows - halfNumWindows,
-        zoneX + halfWidth + 1,
-        zoneY,
-        zoneWidth - halfWidth,
-        zoneHeight
+        new Rect(zoneRect.x + halfWidth + 1, zoneRect.y, zoneRect.width - halfWidth, zoneRect.height)
       );
     } else {
-      const halfHeight = Math.floor(zoneHeight / 2);
+      const halfHeight = Math.floor(zoneRect.height / 2);
       tileContext = this.computeTiles(
         tileContext,
         halfNumWindows,
-        zoneX,
-        zoneY,
-        zoneWidth,
-        halfHeight
+        new Rect(zoneRect.x, zoneRect.y, zoneRect.width, halfHeight)
       );
       tileContext = this.computeTiles(
         tileContext,
         numWindows - halfNumWindows,
-        zoneX,
-        zoneY + halfHeight + 1,
-        zoneWidth,
-        zoneHeight - halfHeight
+        new Rect(zoneRect.x, zoneRect.y + halfHeight + 1, zoneRect.width, zoneRect.height - halfHeight)
       );
     }
     return tileContext;
@@ -268,10 +224,7 @@ class WindowTiler {
     tileContext = this.computeTiles(
       tileContext,
       theWindows.length,
-      theScreen.workArea.left,
-      theScreen.workArea.top,
-      theScreen.workArea.width,
-      theScreen.workArea.height
+      new Rect(theScreen.workArea.left, theScreen.workArea.top, theScreen.workArea.width, theScreen.workArea.height)
     );
     for (let i = 0; i < tileContext.length; i++) {
       const tileContextWithWindowId = tileContext[i];
